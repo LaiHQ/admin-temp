@@ -71,8 +71,9 @@ function docsPlugin(options = {}) {
                 _print()
                 if (!silent) {
                     const { spawn } = require("child_process")
-                    docsProcess = await spawn("cmd", ['/c', "npm run docs:dev"], {
-                        stdio: "inherit"
+                    docsProcess = spawn("npm", ["run", "docs:dev"], {
+                        stdio: "inherit",
+                        shell: true
                     })
                     const colorUrl = (url2) => picocolors.green(url2.replace(/:(\d+)\//, (_, port) => `:${picocolors.bold(port)}/`))
                     console.log(`  ${picocolors.green("\u279C")}  ${picocolors.bold("Document")}: ${colorUrl(`http://localhost:8090/`)}`)
@@ -80,8 +81,8 @@ function docsPlugin(options = {}) {
             }
             process.on('exit', (code) => {
                 docsProcess?.kill()
-            });
-        },
+            })
+        }
     }
 }
 
@@ -188,14 +189,14 @@ export default defineConfig({
     plugins: [
         vue(),
         vueJsx(),
-        eslintPlugin(),
+        // eslintPlugin(),
         pkgConfig(),
         optimizationPersist(),
         svgr(),
         // inspect(),
-        docsPlugin(),
+        // docsPlugin(),
         // mkcert(), // 开启https
-        stylelintPlugin({ fix: true }),
+        // stylelintPlugin({ fix: true }),
         // 自动开启分析页面
         visualizer({ open: false }),
         autoImport({

@@ -4,4 +4,8 @@
 
 <script setup></script>
 
-<style></style>
+<style>
+.home {
+    height: 100%;
+}
+</style>

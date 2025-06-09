@@ -9,25 +9,28 @@
 <template>
     <a-layout>
         <a-layout-header class="header header-fixed">
-            <Logo />
+            <div class="collapsed-container" :style="{ marginLeft: collapsed ? '70px' : '200px' }">
+                <menu-unfold-outlined
+                    :class="{
+                        'collapsed-warp': true,
+                        'is-collapsed': collapsed
+                    }"
+                    @click="handleChangeCollapsed"
+                />
+                <Breadcrumb style="margin-left: 20px" />
+            </div>
             <User />
         </a-layout-header>
         <a-layout class="page-container-warp">
-            <a-layout-sider class="layout-sider" width="208" style="background: #fff" v-model:collapsed="collapsed">
-                <my-menu v-model:collapsed="collapsed" />
-            </a-layout-sider>
-            <a-layout class="page-container" :style="`${!collapsed ? 'padding:0px 24px 24px 232px' : 'padding:0px 24px 24px 104px;'}`">
-                <div style="display: flex; align-items: center">
-                    <menu-unfold-outlined
-                        :class="{
-                            'collapsed-warp': true,
-                            'is-collapsed': collapsed
-                        }"
-                        @click="handleChangeCollapsed"
-                    />
-                    <Breadcrumb />
-                </div>
-                <a-layout-content :style="{ background: '#ffffff', margin: 0 }">
+            <a-layout class="page-container" :style="`${!collapsed ? 'padding:10px 10px 10px 218px' : 'padding:10px 10px 10px 90px;'}`">
+                <a-layout-sider class="layout-sider" width="208" style="background: #fff" v-model:collapsed="collapsed">
+                    <div class="logo-container">
+                        <Logo :collapsed="collapsed" />
+                    </div>
+                    <my-menu v-model:collapsed="collapsed" />
+                </a-layout-sider>
+                <a-layout-content :style="{ margin: 0 }">
+                    <Tags></Tags>
                     <router-view class="router-view" v-slot="{ Component }">
                         <transition enter-active-class="animate__animated animate__fadeIn">
                             <component :is="Component" :key="$route.path" />
@@ -53,6 +56,8 @@ import Logo from "./Logo"
 import User from "./User"
 import Breadcrumb from "./Breadcrumb"
 import MyMenu from "./Menu"
+import Tags from "./Tags"
+
 import config from "../../config"
 const { copyright, curVersion } = config
 export default defineComponent({
@@ -62,6 +67,7 @@ export default defineComponent({
         Logo,
         Breadcrumb,
         MyMenu,
+        Tags,
         MenuUnfoldOutlined,
         VerticalAlignTopOutlined
     },
@@ -81,7 +87,7 @@ export default defineComponent({
     }
 })
 </script>
-<style lang="less">
+<style lang="less" scoped>
 @header-height: 58px;
 @header-bg-color: #fff;
 @page-bg-color: #f7f8fa;
@@ -98,7 +104,8 @@ export default defineComponent({
     margin-bottom: 2px;
     height: @header-height;
     background: @header-bg-color;
-    box-shadow: rgb(228 230 242) 0 2px 6px 0;
+    // box-shadow: rgb(228 230 242) 0 2px 6px 0;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .header-fixed {
@@ -109,12 +116,13 @@ export default defineComponent({
     z-index: 9;
 }
 
-.layout-sider {
+:deep(.layout-sider) {
     position: fixed;
-    top: @header-height;
+    top: 0;
     left: 0;
     overflow: scroll;
     height: 100%;
+    z-index: 10;
 
     &::-webkit-scrollbar {
         display: none;
@@ -200,5 +208,25 @@ export default defineComponent({
     background-color: @primary-color;
     border-radius: 50%;
     line-height: 50px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // padding: 20px 0;
+    height: @header-height;
+    border-right: 1px solid #f0f0f0;
+}
+
+.collapsed-container {
+    margin-left: 200px;
+    display: flex;
+    align-items: center;
+}
+
+.router-view {
+    background-color: #fff;
+    border-radius: 4px;
 }
 </style>

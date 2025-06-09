@@ -1,14 +1,8 @@
-<!--
- * @Date: 2023-06-15 00:32:50
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-06-15 10:42:02
- * @FilePath: \apph5f:\code\yideCode\temp\admin-temp\src\layouts\Logo\index.vue
--->
 <template>
     <div class="logo-warp">
         <a href="/" class="tohome" title="首页">
             <a-avatar class="icon" :src="logo" :size="38" />
-            <span class="name">{{ title }}</span>
+            <span class="name" v-show="!collapsed">{{ title }}</span>
         </a>
     </div>
 </template>
@@ -22,7 +16,12 @@ const { title, logo } = config
 
 export default defineComponent({
     name: "Logo",
-    props: {},
+    props: {
+        collapsed: {
+            type: Boolean,
+            default: false
+        }
+    },
     components: {},
     setup() {
         return {
@@ -47,6 +46,7 @@ export default defineComponent({
 
     .name {
         // color: #fff;
+        transform: all 0.23s;
     }
 }
 </style>

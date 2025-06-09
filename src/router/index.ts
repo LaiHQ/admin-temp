@@ -12,7 +12,8 @@ import "nprogress/nprogress.css"
 import systemConfig from "../../config/index"
 import { globalLogin } from "@/utils/index"
 import { removeAllPendingRequest } from "@/utils/request"
-import BasicLayout from "@/layouts/BasicLayout.vue"
+// import BasicLayout from "@/layouts/BasicLayout.vue"
+import BasicLayoutV1 from "@/layouts/BasicLayoutV1.vue"
 import useStore from "@/store"
 const { title } = systemConfig
 
@@ -81,7 +82,7 @@ const asyncRouterMap: Array<RouteRecordRaw> = [
     {
         path: "/",
         name: "index",
-        component: BasicLayout,
+        component: BasicLayoutV1,
         meta: {
             title: "首页"
         },

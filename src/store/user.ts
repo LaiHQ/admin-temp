@@ -34,7 +34,14 @@ const useUserInfoStore = defineStore("userInfo", {
     state: () => {
         return {
             user: {},
-            permission: []
+            permission: [],
+
+            tags: [
+                {
+                    key: "dashboard",
+                    title: "首页"
+                }
+            ]
         }
     },
     getters: {
@@ -57,7 +64,7 @@ const useUserInfoStore = defineStore("userInfo", {
     persist: {
         key: "userInfo",
         storage,
-        paths: ["user"],
+        paths: ["user", "tags"],
         debug: import.meta.env.VITE_USER_NODE_ENV === "production",
         beforeRestore: (ctx) => {
             console.log(`beforeRestore '${ctx.store.$id}'`)

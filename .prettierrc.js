@@ -24,5 +24,12 @@ module.exports = {
     bracketSpacing: true,
     // 代码的解析引擎，默认为babylon，与babel相同
     // "parser": "babylon",
-    endOfLine: "lf"
+    endOfLine: "lf",
+    "prettier/prettier": [
+        "error",
+        {
+        "singleQuote": true,
+        "parser": "flow"
+        }
+    ]
 }
