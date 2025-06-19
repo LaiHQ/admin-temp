@@ -6,6 +6,6 @@
 
 <style>
 .home {
-    height: 100%;
+    height: calc(100vh - 110px);
 }
 </style>

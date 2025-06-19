@@ -54,7 +54,7 @@ html {
 
 #app {
     height: 100%;
-    background-color: #f5f4fd;
+    // background-color: #f5f4fd;
 }
 
 #nprogress .bar {

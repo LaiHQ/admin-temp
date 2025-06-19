@@ -1,6 +1,6 @@
 <template>
     <!-- eslint-disable  -->
-    <div style="padding-bottom: 10px;">
+    
         <ScrollX ref="scrollXRef">
             <a-space :size="0">
                 <template v-for="(tag, index) in tagList" :key="tag.key">
@@ -15,7 +15,7 @@
                 </template>
             </a-space>
         </ScrollX>
-    </div>
+   
 </template>
 
 <script setup>

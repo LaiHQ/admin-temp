@@ -131,8 +131,9 @@ defineExpose({
     height: 38px;
     overflow: hidden;
     position: relative;
+    background-color: #f7f8fa;
     .content {
-        padding: 0 8px;
+        padding: 0 10px;
         display: flex;
         align-items: center;
         flex-wrap: nowrap;

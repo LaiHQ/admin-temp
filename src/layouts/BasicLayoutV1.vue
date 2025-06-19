@@ -7,22 +7,19 @@
  * @LastEditTime: 2023-06-19 00:08:41
 -->
 <template>
-    <a-layout>
+    <a-layout class="layout">
         <a-layout-header class="header header-fixed">
             <div class="collapsed-container" :style="{ marginLeft: collapsed ? '70px' : '200px' }">
-                <menu-unfold-outlined
-                    :class="{
-                        'collapsed-warp': true,
-                        'is-collapsed': collapsed
-                    }"
-                    @click="handleChangeCollapsed"
-                />
+                <menu-unfold-outlined :class="{
+                    'collapsed-warp': true,
+                    'is-collapsed': collapsed
+                }" @click="handleChangeCollapsed" />
                 <Breadcrumb style="margin-left: 20px" />
             </div>
             <User />
         </a-layout-header>
         <a-layout class="page-container-warp">
-            <a-layout class="page-container" :style="`${!collapsed ? 'padding:10px 10px 10px 218px' : 'padding:10px 10px 10px 90px;'}`">
+            <a-layout class="page-container" :style="`${!collapsed ? 'padding-left:208px' : 'padding-left:80px;'}`">
                 <a-layout-sider class="layout-sider" width="208" style="background: #fff" v-model:collapsed="collapsed">
                     <div class="logo-container">
                         <Logo :collapsed="collapsed" />
@@ -31,16 +28,18 @@
                 </a-layout-sider>
                 <a-layout-content :style="{ margin: 0 }">
                     <Tags></Tags>
-                    <router-view class="router-view" v-slot="{ Component }">
-                        <transition enter-active-class="animate__animated animate__fadeIn">
-                            <component :is="Component" :key="$route.path" />
-                        </transition>
-                        <div id="components-back-top-demo-custom" title="回到顶部">
-                            <a-back-top>
-                                <vertical-align-top-outlined class="back-top-icon" />
-                            </a-back-top>
-                        </div>
-                    </router-view>
+                    <div class="router-view-container">
+                        <router-view class="router-view" v-slot="{ Component }">
+                            <transition enter-active-class="animate__animated animate__fadeIn">
+                                <component :is="Component" :key="$route.path" />
+                            </transition>
+                            <div id="components-back-top-demo-custom" title="回到顶部">
+                                <a-back-top>
+                                    <vertical-align-top-outlined class="back-top-icon" />
+                                </a-back-top>
+                            </div>
+                        </router-view>
+                    </div>
                 </a-layout-content>
                 <!-- <a-layout-footer class="page-footer-warp">
                     {{ copyright }} ©2023 <a-button type="link" @click="$router.push('/updateLog')">v{{ curVersion }}</a-button>
@@ -95,17 +94,18 @@ export default defineComponent({
 
 .layout {
     min-height: 100vh;
+    background: #fff;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     padding: 0 24px;
-    margin-bottom: 2px;
+    // margin-bottom: 2px;
     height: @header-height;
     background: @header-bg-color;
-    // box-shadow: rgb(228 230 242) 0 2px 6px 0;
     border-bottom: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
 }
 
 .header-fixed {
@@ -113,7 +113,7 @@ export default defineComponent({
     top: 0;
     right: 0;
     left: 0;
-    z-index: 9;
+    z-index: 10;
 }
 
 :deep(.layout-sider) {
@@ -145,22 +145,22 @@ export default defineComponent({
         border-right: 4px solid @primary-color;
     }
 
-    .ant-menu-vertical > .ant-menu-item,
-    .ant-menu-vertical-left > .ant-menu-item,
-    .ant-menu-vertical-right > .ant-menu-item,
-    .ant-menu-inline > .ant-menu-item,
-    .ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title,
-    .ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title,
-    .ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title,
-    .ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
+    .ant-menu-vertical>.ant-menu-item,
+    .ant-menu-vertical-left>.ant-menu-item,
+    .ant-menu-vertical-right>.ant-menu-item,
+    .ant-menu-inline>.ant-menu-item,
+    .ant-menu-vertical>.ant-menu-submenu>.ant-menu-submenu-title,
+    .ant-menu-vertical-left>.ant-menu-submenu>.ant-menu-submenu-title,
+    .ant-menu-vertical-right>.ant-menu-submenu>.ant-menu-submenu-title,
+    .ant-menu-inline>.ant-menu-submenu>.ant-menu-submenu-title {
         height: 40px;
         line-height: 40px;
         margin: 4px;
         width: calc(100% - 8px);
     }
 
-    .ant-menu-sub.ant-menu-inline > .ant-menu-item,
-    .ant-menu-sub.ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
+    .ant-menu-sub.ant-menu-inline>.ant-menu-item,
+    .ant-menu-sub.ant-menu-inline>.ant-menu-submenu>.ant-menu-submenu-title {
         height: 40px;
         line-height: 40px;
         margin: 4px;
@@ -172,6 +172,7 @@ export default defineComponent({
     padding-top: @header-height;
     min-height: 100%;
     box-sizing: border-box;
+    background: #ffff;
 
     .collapsed-warp {
         cursor: pointer;
@@ -185,8 +186,9 @@ export default defineComponent({
 }
 
 .page-container {
-    min-height: calc(100vh - 64px);
-    background: @page-bg-color;
+    // min-height: calc(100vh - @header-height);
+    // background: @page-bg-color;
+    background: #fff;
 }
 
 .page-footer-warp {
@@ -225,8 +227,15 @@ export default defineComponent({
     align-items: center;
 }
 
+.router-view-container {
+    min-height: calc(100% - 38px);
+    background: @page-bg-color;
+    padding: 2px 10px 10px 10px;
+}
+
 .router-view {
     background-color: #fff;
     border-radius: 4px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 </style>
