@@ -1,5 +1,5 @@
 <template>
-    <a-menu mode="inline" :style="{ height: '100%' }" v-model:openKeys="openKeys" v-model:selectedKeys="selectedKeys" @click="handleMenuClick" :inline-collapsed="collapsed" @select="onSelect">
+    <a-menu mode="inline" :theme="system.theme" :style="{ height: '100%' }" v-model:openKeys="openKeys" v-model:selectedKeys="selectedKeys" @click="handleMenuClick" :inline-collapsed="collapsed" @select="onSelect">
         <!--  -->
         <SubMenu :item="item" v-for="item in menuData" :key="item.path" />
         <!--  -->
@@ -118,10 +118,11 @@ export default {
         })
         // 此处本地调试获取路由表渲染，后期需从vuex获取服务器数据生成
         // const menuData = getMenuData(router.options.routes[0].children)
-        const { user } = useStore()
+        const { user, system } = useStore()
         const menuData = getMenuData(user.getPermission[0].children)
         return {
             ...toRefs(state),
+            system,
             menuData,
             onSelect,
             handleMenuClick

@@ -1,19 +1,11 @@
-/*
- * @Descripttion: 项目全局配置
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2023-02-28 17:54:58
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-06-19 20:52:10
- */
 import { version } from "../package.json"
 
 export default {
     logo: "@/assets/logo.jpg",
     // 标题
-    title: "后台管理系统",
+    title: "一加壹教育云平台",
     // 描述
-    description: "吾生也有涯 而知也无涯！",
+    description: "构建人本、开放、平等、可持续的教育新生态",
     //
     keywords: "",
     lang: "",
@@ -25,7 +17,7 @@ export default {
     // 版权
     copyright: "2023 www.xxx.com",
     // 备案号
-    filingNo: "粤ICP备17016076号",
+    filingNo: "粤ICP备17028019号-4",
     // 部署的域名，用来dns与预解析
     originURL: "",
     // 预加载脚本

@@ -125,13 +125,19 @@ defineExpose({
 </script>
 
 <style lang="less" scoped>
+[data-theme="dark"] {
+    .wrapper {
+        border-color: #2e2e32 !important;
+    }
+}
 .wrapper {
     display: flex;
     z-index: 9;
     height: 38px;
     overflow: hidden;
     position: relative;
-    background-color: #f7f8fa;
+    background-color: var(--bg-color, #f7f8fa);
+    border-bottom: 1px solid #f0f0f0;
     .content {
         padding: 0 10px;
         display: flex;

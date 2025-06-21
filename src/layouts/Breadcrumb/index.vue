@@ -1,9 +1,3 @@
-<!--
- * @Date: 2023-06-14 23:58:31
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-06-21 18:49:22
- * @FilePath: \apph5f:\code\yideCode\temp\admin-temp\src\layouts\Breadcrumb\index.vue
--->
 <template>
     <a-breadcrumb style="padding: 16px 0">
         <a-breadcrumb-item v-for="(item, index) in breadcrumbList" :key="item.path">
@@ -14,6 +8,7 @@
                         ...$route.query
                     }
                 }"
+                style="color: var(--text-color, #333)"
             >
                 <home-outlined v-if="index === 0" />
                 <component v-else :is="item.icon" />
@@ -68,3 +63,9 @@ export default defineComponent({
     }
 })
 </script>
+
+<style scoped>
+:deep(.ant-breadcrumb-separator) {
+    color: var(--text-color, #333);
+}
+</style>

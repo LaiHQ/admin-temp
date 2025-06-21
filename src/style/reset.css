@@ -308,7 +308,3 @@ a:active {
 *, *::before, *::after {
     box-sizing: border-box;
 }
-
-.ant-btn{
-	border-radius:0;
-}

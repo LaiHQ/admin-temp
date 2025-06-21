@@ -5,7 +5,7 @@
             <a-space :size="0">
                 <template v-for="(tag, index) in tagList" :key="tag.key">
                     <a-dropdown :trigger="['contextmenu']">
-                        <a-tag ref="tagRefs" :class="['yd_tag', { activeClass: tag.key === activeTag?.key }]" :key="tag.key" :closable="tag.key != 'check' && tagList.length > 1" @click="(e) => handleTagClick(e, tag.key)" @close.prevent="close(index)" @contextmenu.prevent="handleContextMenu(tag)">
+                        <a-tag ref="tagRefs" :class="['tag', { activeClass: tag.key === activeTag?.key }]" :key="tag.key" :closable="tag.key != 'check' && tagList.length > 1" @click="(e) => handleTagClick(e, tag.key)" @close.prevent="close(index)" @contextmenu.prevent="handleContextMenu(tag)">
                             {{ tag.title }}
                         </a-tag>
                         <template #overlay>
@@ -89,22 +89,28 @@ async function handleContextMenu(tagItem) {
 </script>
 
 <style lang="less" scoped>
-.yd_tag {
+.tag {
     height: 26px;
     padding: 0px 8px 0px 8px;
-    background-color: #fff;
+    background-color: var(--bg-color, #f7f8fa);
     line-height: 24px;
     border-radius: 4px;
     cursor: pointer;
-
+    color: var(--text-color, #333);
+   
     :deep(.ant-tag-close-icon) {
         padding-left: 4px;
+    }
+}
+[data-theme="dark"] {
+    .tag {
+         border-color: #2e2e32 !important;
     }
 }
 
 .activeClass {
     color: #fff;
-    background-color: @primary-color;
+    background-color: var(--primary-color);
 
     :deep(.ant-tag-close-icon) {
         svg {

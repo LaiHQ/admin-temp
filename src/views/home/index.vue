@@ -1,11 +1,16 @@
 <template>
-    <div class="home">home</div>
+    <div class="home">
+        <a-button type="primary">Primary</a-button>
+    </div>
 </template>
 
-<script setup></script>
+<script setup>
+const a = 1
+console.log(a)
+</script>
 
-<style>
+<style scoped>
 .home {
-    height: calc(100vh - 110px);
+    height: calc(100vh - 120px);
 }
 </style>

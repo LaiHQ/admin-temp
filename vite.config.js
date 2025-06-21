@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 构建配置文件
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2023-02-20 19:52:42
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-06-21 18:43:20
- */
 import { defineConfig } from "vite"
 import path from "path"
 import vue from "@vitejs/plugin-vue"
@@ -13,7 +5,6 @@ import eslintPlugin from "vite-plugin-eslint"
 import vueJsx from "@vitejs/plugin-vue-jsx"
 import { visualizer } from "rollup-plugin-visualizer"
 import { createHtmlPlugin } from "vite-plugin-html"
-import { createStyleImportPlugin, AndDesignVueResolve } from "vite-plugin-style-import"
 import autoComopnents from "unplugin-vue-components/vite"
 import { AntDesignVueResolver as AntDesignVueComp } from "unplugin-vue-components/resolvers"
 import autoImport from "unplugin-auto-import/vite"
@@ -79,7 +70,7 @@ function docsPlugin(options = {}) {
                     console.log(`  ${picocolors.green("\u279C")}  ${picocolors.bold("Document")}: ${colorUrl(`http://localhost:8090/`)}`)
                 }
             }
-            process.on('exit', (code) => {
+            process.on("exit", (code) => {
                 docsProcess?.kill()
             })
         }
@@ -135,7 +126,8 @@ export default defineConfig({
                 ws: true,
                 changeOrigin: true
             }
-        }
+        },
+        historyApiFallback: true
     },
     resolve: {
         extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".vue", ".less"],
@@ -161,24 +153,24 @@ export default defineConfig({
         preprocessorOptions: {
             less: {
                 modifyVars: {
-                    "primary-color": "#00B781", // 全局主色
-                    "link-color": "#1890ff", // 链接色
-                    "success-color": "#00B781", // 成功色
-                    "warning-color": "#faad14", // 警告色
-                    "error-color": "#f5222d", // 错误色
-                    "font-size-base": "14px", // 主字号
-                    "heading-color": "rgba(0, 0, 0, 0.85)", // 标题色
-                    "text-color": "#000000D9", // 主文本色
-                    "text-color-secondary": "rgba(0, 0, 0, 0.45)", // 次文本色
-                    "disabled-color": "rgba(0, 0, 0, 0.25)", // 失效色
-                    "suggestive-color": "#00000073", // 提示性文字
-                    "border-radius-base": "4px", // 组件/浮层圆角
-                    "border-color-base": "#d9d9d9", // 边框色
-                    "box-shadow-base": "0 2px 8px rgba(0, 0, 0, 0.15)", // 浮层阴影.
-                    "body-background": "#ffffff", // 白色
-                    "gray-background": "#F6F6F6", // 灰色背景
-                    "acitve-background": "#00B78114", // 选中颜色
-                    "picker-basic-cell-hover-with-range-color": "#dff7ec"
+                    // "primary-color": "#00B781", // 全局主色
+                    // "link-color": "#1890ff", // 链接色
+                    // "success-color": "#00B781", // 成功色
+                    // "warning-color": "#faad14", // 警告色
+                    // "error-color": "#f5222d", // 错误色
+                    // "font-size-base": "14px", // 主字号
+                    // "heading-color": "rgba(0, 0, 0, 0.85)", // 标题色
+                    // "text-color": "#000000D9", // 主文本色
+                    // "text-color-secondary": "rgba(0, 0, 0, 0.45)", // 次文本色
+                    // "disabled-color": "rgba(0, 0, 0, 0.25)", // 失效色
+                    // "suggestive-color": "#00000073", // 提示性文字
+                    // "border-radius-base": "4px", // 组件/浮层圆角
+                    // "border-color-base": "#d9d9d9", // 边框色
+                    // "box-shadow-base": "0 2px 8px rgba(0, 0, 0, 0.15)", // 浮层阴影.
+                    // "body-background": "#ffffff", // 白色
+                    // "gray-background": "#F6F6F6", // 灰色背景
+                    // "acitve-background": "#00B78114", // 选中颜色
+                    // "picker-basic-cell-hover-with-range-color": "#dff7ec"
                 },
 
                 javascriptEnabled: true
@@ -193,8 +185,8 @@ export default defineConfig({
         pkgConfig(),
         optimizationPersist(),
         svgr(),
-        // inspect(),
-        // docsPlugin(),
+        inspect(),
+        docsPlugin(),
         // mkcert(), // 开启https
         // stylelintPlugin({ fix: true }),
         // 自动开启分析页面
@@ -220,24 +212,11 @@ export default defineConfig({
             dts: "types/components.d.ts",
             resolvers: [
                 AntDesignVueComp({
-                    importStyle: "less"
+                    importStyle: false,
+                    resolveIcons: true
                 })
             ]
         }),
-
-        createStyleImportPlugin({
-            resolves: [AndDesignVueResolve()],
-            libs: [
-                {
-                    libraryName: "ant-design-vue",
-                    esModule: true,
-                    resolveStyle: (name) => {
-                        return `ant-design-vue/lib/${name}/style/index.less`
-                    }
-                }
-            ]
-        }),
-
         createHtmlPlugin({
             minify: true,
             inject: {
@@ -383,7 +362,7 @@ export default defineConfig({
         },
         // 需要兼容安卓端微信的 webview 时以防止 vite 将 rgba() 颜色转化为 #RGBA 十六进制符号的形式
         cssTarget: "chrome61",
-        //关闭文件计算
+        // 关闭文件计算
         reportCompressedSize: false,
         //   关闭生成map文件 可以达到缩小打包体积
         sourcemap: false // 这个生产环境一定要关闭，不然打包的产物会很大

@@ -45,7 +45,7 @@ export default defineComponent({
     }
 
     .name {
-        // color: #fff;
+        color: var(--text-color, #333);
         transform: all 0.23s;
     }
 }

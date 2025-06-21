@@ -46,7 +46,7 @@ LoadingTemp.innerHTML = `
 			display: block;
 			width: 10px;
 			height: 10px;
-			background-color: #00b781;
+			background-color: var(--primary-color,#333);
 			border-radius: 100%;
 			transform: scale(0.75);
 			transform-origin: 50% 50%;
@@ -85,7 +85,7 @@ LoadingTemp.innerHTML = `
 			width: 100%;
 			font-size: 14px;
 			text-align: center;
-			color: #00b781;
+			color: var(--primary-color);
 			text-shadow: 0 1px 2px #fff;
 		}
 	</style>

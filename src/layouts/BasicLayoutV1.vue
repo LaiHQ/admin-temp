@@ -1,26 +1,21 @@
-<!--
- * @Descripttion: 登录后布局组件
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2021-12-23 13:35:18
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-06-19 00:08:41
--->
 <template>
     <a-layout class="layout">
         <a-layout-header class="header header-fixed">
             <div class="collapsed-container" :style="{ marginLeft: collapsed ? '70px' : '200px' }">
-                <menu-unfold-outlined :class="{
-                    'collapsed-warp': true,
-                    'is-collapsed': collapsed
-                }" @click="handleChangeCollapsed" />
+                <menu-unfold-outlined
+                    :class="{
+                        'collapsed-warp': true,
+                        'is-collapsed': collapsed
+                    }"
+                    @click="handleChangeCollapsed"
+                />
                 <Breadcrumb style="margin-left: 20px" />
             </div>
             <User />
         </a-layout-header>
         <a-layout class="page-container-warp">
             <a-layout class="page-container" :style="`${!collapsed ? 'padding-left:208px' : 'padding-left:80px;'}`">
-                <a-layout-sider class="layout-sider" width="208" style="background: #fff" v-model:collapsed="collapsed">
+                <a-layout-sider class="layout-sider" width="208" v-model:collapsed="collapsed">
                     <div class="logo-container">
                         <Logo :collapsed="collapsed" />
                     </div>
@@ -103,9 +98,19 @@ export default defineComponent({
     padding: 0 24px;
     // margin-bottom: 2px;
     height: @header-height;
-    background: @header-bg-color;
+    background: var(--bg-color, #fff);
     border-bottom: 1px solid #f0f0f0;
-    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+    // box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+    .header {
+        border-color: #2e2e32 !important;
+    }
+
+    .logo-container {
+        border-color: #2e2e32 !important;
+    }
 }
 
 .header-fixed {
@@ -123,6 +128,7 @@ export default defineComponent({
     overflow: scroll;
     height: 100%;
     z-index: 10;
+    background: var(--bg-color, #fff);
 
     &::-webkit-scrollbar {
         display: none;
@@ -130,7 +136,7 @@ export default defineComponent({
 
     .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
         // background-color: @page-bg-color;
-        background-color: #e8f8f3;
+        background-color: var(--primary-color-bg);
         border-radius: 8px;
         // margin: 4px;
     }
@@ -142,29 +148,37 @@ export default defineComponent({
         position: absolute;
         inset: 8px 208px 8px 0;
         border-radius: 5px;
-        border-right: 4px solid @primary-color;
+        border-right: 4px solid var(--primary-color);
     }
 
-    .ant-menu-vertical>.ant-menu-item,
-    .ant-menu-vertical-left>.ant-menu-item,
-    .ant-menu-vertical-right>.ant-menu-item,
-    .ant-menu-inline>.ant-menu-item,
-    .ant-menu-vertical>.ant-menu-submenu>.ant-menu-submenu-title,
-    .ant-menu-vertical-left>.ant-menu-submenu>.ant-menu-submenu-title,
-    .ant-menu-vertical-right>.ant-menu-submenu>.ant-menu-submenu-title,
-    .ant-menu-inline>.ant-menu-submenu>.ant-menu-submenu-title {
+    .ant-menu-vertical > .ant-menu-item,
+    .ant-menu-vertical-left > .ant-menu-item,
+    .ant-menu-vertical-right > .ant-menu-item,
+    .ant-menu-inline > .ant-menu-item,
+    .ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title,
+    .ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title,
+    .ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title,
+    .ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
         height: 40px;
         line-height: 40px;
         margin: 4px;
         width: calc(100% - 8px);
     }
 
-    .ant-menu-sub.ant-menu-inline>.ant-menu-item,
-    .ant-menu-sub.ant-menu-inline>.ant-menu-submenu>.ant-menu-submenu-title {
+    .ant-menu-sub.ant-menu-inline > .ant-menu-item,
+    .ant-menu-sub.ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
         height: 40px;
         line-height: 40px;
         margin: 4px;
         width: calc(100% - 8px);
+    }
+
+    .ant-menu-dark {
+        background: var(--bg-color, #fff);
+    }
+
+    .ant-menu-light {
+        background: var(--bg-color, #fff);
     }
 }
 
@@ -172,7 +186,7 @@ export default defineComponent({
     padding-top: @header-height;
     min-height: 100%;
     box-sizing: border-box;
-    background: #ffff;
+    background: var(--bg-color, #fff);
 
     .collapsed-warp {
         cursor: pointer;
@@ -207,7 +221,7 @@ export default defineComponent({
     font-size: 25px;
     text-align: center;
     color: #fff;
-    background-color: @primary-color;
+    background-color: var(--primary-color);
     border-radius: 50%;
     line-height: 50px;
 }
@@ -230,11 +244,12 @@ export default defineComponent({
 .router-view-container {
     min-height: calc(100% - 38px);
     background: @page-bg-color;
-    padding: 2px 10px 10px 10px;
+    padding: 10px 10px 10px 10px;
 }
 
 .router-view {
-    background-color: #fff;
+    background-color: var(--bg-color, #fff);
+    padding: 10px;
     border-radius: 4px;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }

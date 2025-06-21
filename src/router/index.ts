@@ -6,13 +6,12 @@
  * @LastEditors: lai_hq@qq.com
  * @LastEditTime: 2023-06-18 22:57:07
  */
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router"
+import { createRouter, createWebHashHistory,createWebHistory, RouteRecordRaw } from "vue-router"
 import NProgress from "nprogress"
 import "nprogress/nprogress.css"
 import systemConfig from "../../config/index"
 import { globalLogin } from "@/utils/index"
 import { removeAllPendingRequest } from "@/utils/request"
-// import BasicLayout from "@/layouts/BasicLayout.vue"
 import BasicLayoutV1 from "@/layouts/BasicLayoutV1.vue"
 import useStore from "@/store"
 const { title } = systemConfig
@@ -104,6 +103,7 @@ const asyncRouterMap: Array<RouteRecordRaw> = [
                     title: "列表",
                     icon: "unordered-list-outlined"
                 },
+
                 component: () => import("@/views/list/index.vue")
             },
             {
@@ -163,15 +163,19 @@ const asyncRouterMap: Array<RouteRecordRaw> = [
 
 const router = createRouter({
     history: createWebHashHistory(),
-    routes: constantRoutes
+    routes: constantRoutes,
+    scrollBehavior() {
+        return { top: 0, left: 0 }
+    }
 })
 
 const whiteList: string[] = ["user", "login", "register", "NotFound"]
 
-async function initRouters(user) {
+async function initRouters(user: any) {
     const permission = asyncRouterMap[0]
-    user.setPermission(asyncRouterMap)
 
+
+    user.setPermission(asyncRouterMap)
     router.addRoute(permission)
 }
 
@@ -199,7 +203,7 @@ router.beforeEach(async (to, from, next) => {
             }
         }
     } else {
-        if (whiteList.includes(to.name)) {
+        if (whiteList.includes(to.name as string)) {
             next()
         } else {
             next({ path: "user/login", query: { redirect: to.fullPath } })

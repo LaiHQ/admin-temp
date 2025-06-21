@@ -12,17 +12,15 @@
 
  * @version: 1.0.0
  * @Author: lai_hq@qq.com
- * @Date: 2023-03-15 18:15:13
+ * @Date: 2025-06-20 18:15:13
  * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-03-28 18:11:11
+ * @LastEditTime: 2025-06-20 18:11:11
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Canceler, AxiosAdapter } from "axios"
 import router from "@/router"
 import { message } from "ant-design-vue"
 import Qs from "qs"
 import { globalLogin, debounce, reportErrorLog } from "@/utils/index"
-
-console.log(import.meta.env)
 
 // 增强配置
 // interface CustomAxiosRequestConfig {

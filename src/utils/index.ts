@@ -86,3 +86,7 @@ export function globalLogin(display: "show" | "hide", tip?: string) {
         loginDom.setAttribute("spinning", display)
     }
 }
+
+export function setRootVariable(name: string, value: string) {
+    document.documentElement.style.setProperty(name, value)
+}

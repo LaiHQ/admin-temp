@@ -1,19 +1,39 @@
 <template>
     <div class="user-wrapper">
         <div class="content-wrapper">
-            <a-tooltip placement="bottom">
-                <template #title>
-                    <span>开发文档</span>
-                </template>
-                <a-button type="text" href="http://localhost:8090/" target="_blank">
-                    <template #icon><question-circle-outlined /></template>
-                </a-button>
-            </a-tooltip>
+            <template v-if="isDev">
+                <a-tooltip placement="bottom">
+                    <template #title>
+                        <span>{{ system.theme === "light" ? "默认主题" : "暗黑主题" }}</span>
+                    </template>
+                    <a-switch v-model:checked="system.theme" checkedValue="dark" unCheckedValue="light"
+                        style="margin-right: 10px" @change="system.setCurrentTheme">
+                        <template #checkedChildren>
+                            <div class="moon"></div>
+                        </template>
+                        <template #unCheckedChildren>
+                            <div class="sun"></div>
+                        </template>
+                    </a-switch>
+                </a-tooltip>
+
+                <a-input v-model:value="system.primaryColor" type="color"
+                    style="width: 28px; height: 28px; padding: 2px; margin-right: 10px" @change="changePrimary" />
+                <a-tooltip placement="bottom">
+                    <template #title>
+                        <span>开发文档</span>
+                    </template>
+                    <a-button type="text" href="http://localhost:8090/" target="_blank">
+                        <template #icon>
+                            <BugOutlined />
+                        </template>
+                    </a-button>
+                </a-tooltip>
+            </template>
             <a-dropdown @visibleChange="userVisibleChange">
                 <span class="action">
                     <a-avatar class="avatar" size="small" :src="avatar" />
-                    <span class="nickname"
-                        >{{ nickname }}
+                    <span class="nickname">{{ nickname }}
                         <caret-down-outlined :class="`caretup-${userVisible}`" />
                     </span>
                 </span>
@@ -47,11 +67,14 @@
     </div>
 </template>
 
-<script lang="ts">
-import { ExclamationCircleOutlined, QuestionCircleOutlined, CaretDownOutlined, UserOutlined, KeyOutlined, SettingOutlined, PoweroffOutlined } from "@ant-design/icons-vue"
+<script>
+import { ExclamationCircleOutlined, BugOutlined, CaretDownOutlined, UserOutlined, KeyOutlined, SettingOutlined, PoweroffOutlined } from "@ant-design/icons-vue"
 import { reactive, createVNode, defineComponent, toRefs } from "vue"
 import { Modal, message } from "ant-design-vue"
 import { useRouter } from "vue-router"
+import useStore from "@/store"
+import { debounce } from "@/utils"
+
 export default defineComponent({
     name: "User",
     components: {
@@ -60,7 +83,7 @@ export default defineComponent({
         KeyOutlined,
         SettingOutlined,
         PoweroffOutlined,
-        QuestionCircleOutlined
+        BugOutlined
     },
     setup() {
         const state = reactive({
@@ -68,7 +91,8 @@ export default defineComponent({
             nickname: "张三",
             userVisible: false
         })
-        const userVisibleChange = (v: boolean) => {
+        const { system } = useStore()
+        const userVisibleChange = (v) => {
             state.userVisible = v
         }
         const router = useRouter()
@@ -92,10 +116,20 @@ export default defineComponent({
                 class: "test"
             })
         }
+        const isDev = import.meta.env.MODE === "development"
+
+        const changePrimary = debounce((e) => {
+            // console.log(e.target.value)
+            system.setPrimaryColor(e.target.value)
+        }, 500)
+
         return {
             ...toRefs(state),
+            system,
             handleLogout,
-            userVisibleChange
+            userVisibleChange,
+            changePrimary,
+            isDev
         }
     }
 })
@@ -127,7 +161,7 @@ export default defineComponent({
 
     .nickname {
         font-size: 14px;
-        // color: #fff;
+        color: var(--text-color, #333);
     }
 
     .caretup-false {
@@ -138,6 +172,30 @@ export default defineComponent({
     .caretup-true {
         transition: all 0.25s;
         transform: rotate(180deg);
+    }
+
+    :deep(.ant-switch-inner-checked) {
+        display: flex;
+        height: 22px;
+        align-items: center;
+    }
+
+    :deep(.ant-switch-inner-unchecked) {
+        display: flex;
+        height: 22px;
+        align-items: center;
+    }
+
+    .sun {
+        width: 12px;
+        height: 12px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'/%3E%3C/svg%3E") no-repeat;
+    }
+
+    .moon {
+        width: 12px;
+        height: 12px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z'/%3E%3C/svg%3E") no-repeat;
     }
 }
 </style>

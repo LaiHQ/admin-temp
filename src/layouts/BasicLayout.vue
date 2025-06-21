@@ -134,7 +134,7 @@ export default defineComponent({
         position: absolute;
         inset: 8px 208px 8px 0;
         border-radius: 5px;
-        border-right: 4px solid @primary-color;
+        border-right: 4px solid var(--primary-color);
     }
 
     .ant-menu-vertical > .ant-menu-item,
@@ -197,7 +197,7 @@ export default defineComponent({
     font-size: 25px;
     text-align: center;
     color: #fff;
-    background-color: @primary-color;
+    background-color: var(--primary-color);
     border-radius: 50%;
     line-height: 50px;
 }
