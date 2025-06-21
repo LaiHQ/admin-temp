@@ -20,7 +20,10 @@ import "dayjs/locale/zh-cn"
 import { setRootVariable } from "@/utils"
 import useStore from "@/store"
 import { message } from "ant-design-vue"
+import { watch } from "vue"
+
 const { system } = useStore()
+const route = useRoute()
 
 const watchNetwork = () => {
     let title = ""
@@ -78,6 +81,21 @@ watch(
     () => system.theme,
     (v) => {
         document.body.setAttribute("data-theme", v)
+    },
+    {
+        immediate: true
+    }
+)
+
+watch(
+    () => route.query,
+    (v) => {
+        if (v.theme) {
+            system.setCurrentTheme(v.theme)
+        }
+        if (v.primaryColor) {
+            system.setPrimaryColor("#" + v.primaryColor)
+        }
     },
     {
         immediate: true
