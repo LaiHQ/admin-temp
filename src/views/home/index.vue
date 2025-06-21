@@ -5,8 +5,15 @@
 </template>
 
 <script setup>
-const a = 1
-console.log(a)
+import {getSystemRouter} from "@/api"
+
+http.get("/system/menu/getRouters",{}).then((res) => {
+    console.log(res)
+})
+
+// getSystemRouter().then(res=>{
+//     console.log(res)
+// })
 </script>
 
 <style scoped>

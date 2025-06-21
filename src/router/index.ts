@@ -11,7 +11,7 @@ import NProgress from "nprogress"
 import "nprogress/nprogress.css"
 import systemConfig from "../../config/index"
 import { globalLogin } from "@/utils/index"
-import { removeAllPendingRequest } from "@/utils/request"
+import { removeAllPendingRequest } from "@/utils/http"
 import BasicLayoutV1 from "@/layouts/BasicLayoutV1.vue"
 import useStore from "@/store"
 const { title } = systemConfig

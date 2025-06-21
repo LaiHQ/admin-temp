@@ -1,7 +1,7 @@
-import request from "@/utils/request"
+import http from "@/utils/http"
 
 export function login(data) {
-    return request({
+    return http({
         url: "/login11",
         method: "post",
         loading: true,
@@ -14,7 +14,7 @@ export function login(data) {
  * @description: 获取用户信息
  */
 export function getUserInfo() {
-    return request({
+    return http({
         url: "/getUserInfo",
         method: "get"
         // successMessage: true,
@@ -31,7 +31,7 @@ export function getUserInfo() {
  * @description: 导出
  */
 export function exportFile(params: object, fileName: string) {
-    request({
+    http({
         url: "/export",
         method: "get",
         responseType: "arraybuffer",
@@ -49,5 +49,13 @@ export function exportFile(params: object, fileName: string) {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
+    })
+}
+
+export function getSystemRouter(data = {}) {
+    return http({
+        url: "/system/menu/getRouters",
+        method: "get",
+        params: data
     })
 }

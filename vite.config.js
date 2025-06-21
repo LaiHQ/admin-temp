@@ -121,13 +121,13 @@ export default defineConfig({
         port: 8080,
         host: "0.0.0.0",
         proxy: {
-            "/api": {
-                target: "http://localhost:3000/api",
-                ws: true,
-                changeOrigin: true
-            }
-        },
-        historyApiFallback: true
+            // "/api": {
+            //     target: "http://localhost:3000/api",
+            //     ws: true,
+            //     changeOrigin: true
+            // }
+        }
+        // historyApiFallback: true
     },
     resolve: {
         extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".vue", ".less"],
@@ -198,7 +198,8 @@ export default defineConfig({
             dts: "types/auto-import.d.ts",
             eslintrc: {
                 enabled: true
-            }
+            },
+            dirs: ["src/utils/http.ts"]
         }),
         createSvgIconsPlugin({
             iconDirs: [path.join(__dirname, "src/assets/icons")],

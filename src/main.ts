@@ -18,6 +18,7 @@ import "./style/reset.css"
 import "virtual:svg-icons-register"
 import { HomeOutlined, UnorderedListOutlined, SettingOutlined } from "@ant-design/icons-vue"
 
+
 const app = createApp(App)
 
 const icons = [HomeOutlined, UnorderedListOutlined, SettingOutlined]

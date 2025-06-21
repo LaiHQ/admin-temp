@@ -52,7 +52,7 @@ const tipMsg = debounce((msg: string, type: "success" | "info" | "warning" | "er
     message[type] && message[type](msg)
 }, 1000)
 
-const request = axios.create({
+const http = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL as string,
     timeout: 5000,
     adapter: adapterEnhancer({
@@ -68,7 +68,7 @@ const request = axios.create({
     // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 })
 // 设置post请求头
-request.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8"
+http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8"
 
 // 所有正在请求的接口
 const pendingRequest: Map<string, Canceler> = new Map()
@@ -264,7 +264,7 @@ async function handleRefreshToken(config: AxiosRequestConfig) {
             // 对之前错误的接口再次请求
             config.cancelToken = void 0
             // debugger
-            request(config)
+            http(config)
             return Promise.resolve("update token")
         }
     } catch (error) {
@@ -351,7 +351,7 @@ function handleAuthError(config: AxiosRequestConfig) {
 }
 
 // 添加请求拦截器
-request.interceptors.request.use(
+http.interceptors.request.use(
     (config) => {
         const { loading, loadingText } = config
         // debugger
@@ -368,9 +368,9 @@ request.interceptors.request.use(
 )
 
 // 添加响应拦截器
-request.interceptors.response.use(
+http.interceptors.response.use(
     (response) => {
-        const { loading, successMessage } = response.config
+        const { loading, successMessage } = response.config        
         // 从pendingRequest对象中移除请求
         removePendingRequest(response.config)
         if (loading) globalLogin("hide")
@@ -416,4 +416,5 @@ request.interceptors.response.use(
         return Promise.reject(error || {})
     }
 )
-export default request
+
+export default http
