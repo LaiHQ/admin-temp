@@ -25,7 +25,10 @@
                     <Tags></Tags>
                     <div class="router-view-container">
                         <router-view class="router-view" v-slot="{ Component }">
-                            <transition enter-active-class="animate__animated animate__fadeIn">
+                            <template v-if="Component === undefined">
+                                <NotFound :style="{ height: 'calc(100vh - 120px)' }" :title="`找不到 ${$route.path} 相关组件，检查路由配置信息。`" />
+                            </template>
+                            <transition v-else enter-active-class="animate__animated animate__fadeIn">
                                 <component :is="Component" :key="$route.path" />
                             </transition>
                             <div id="components-back-top-demo-custom" title="回到顶部">
@@ -51,6 +54,7 @@ import User from "./User"
 import Breadcrumb from "./Breadcrumb"
 import MyMenu from "./Menu"
 import Tags from "./Tags"
+import NotFound from "@/views/error/404.vue"
 
 import config from "../../config"
 const { copyright, curVersion } = config
@@ -63,7 +67,8 @@ export default defineComponent({
         MyMenu,
         Tags,
         MenuUnfoldOutlined,
-        VerticalAlignTopOutlined
+        VerticalAlignTopOutlined,
+        NotFound
     },
     setup() {
         const state = reactive({

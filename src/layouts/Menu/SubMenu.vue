@@ -1,12 +1,5 @@
-<!--
- * @Date: 2021-12-24 22:57:48
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-06-15 12:08:05
- * @FilePath: \apph5f:\code\yideCode\temp\admin-temp\src\layouts\Menu\SubMenu.vue
--->
-
 <template>
-    <a-sub-menu v-if="item.children && item.children.length" :key="item.path">
+    <a-sub-menu v-if="item.children && item.children.length" :key="item.path" :meta="item.meta">
         <template #title>
             <component :is="item.meta && item.meta.icon"></component>
             <span
@@ -20,7 +13,7 @@
         </template>
         <SubMenu :item="citem" v-for="citem in item.children" :key="citem.path" />
     </a-sub-menu>
-    <a-menu-item v-else :key="item.path">
+    <a-menu-item v-else :key="item.path" :meta="item.meta">
         <component :is="item.meta && item.meta.icon"></component>
         <span>{{ item.meta && item.meta.title }}</span>
     </a-menu-item>

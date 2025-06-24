@@ -16,7 +16,7 @@
                         <span class="title">{{ title }}</span>
                     </a>
                 </div>
-                <div class="desc">—————————————————————————————— {{ description }}</div>
+                <div class="desc">{{ description }}</div>
             </div>
             <div class="main">
                 <a-form>
@@ -110,7 +110,7 @@ function submit() {
             state.loginBtn = true
             // login,getUserInfo
             user.setupInfo(toRaw(modelRef))
-            localStorage.setItem("token", "abkjklaji")
+            localStorage.setItem("token", "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiIxMzY3MTU3NTEyNCIsInNjb3BlIjpbImFsbCJdLCJyb2xlcyI6bnVsbCwibmFtZSI6Iua1i-ivleWutumVvyIsImlkIjoxNTE1OTU0NDc2ODg0MjU0NzIxLCJ1c2VyVHlwZSI6bnVsbCwiZXhwIjoxNzUwNzQ4NzY5LCJiaWQiOjE1MTYyMzIyNDg1NDk0NDk3MjksImp0aSI6IjExNjA2ZTkzLWM3NGYtNGVhOS05NDQ1LTVjY2M5MWU3OTUwNiIsImNsaWVudF9pZCI6InlpZGUtY2xvdWQiLCJ1c2VybmFtZSI6IjEzNjcxNTc1MTI0In0.sViv18wfN05_GS4JywF4SB1wMHbMhiHZMarzit_pKdkwhTXpA3a72ayj9PmHGmhHJKyM1XD5Pu7TvfEB9MNGQedw6jIezc9jGMWyppvUSWDRUrQhnT2x_-4jhOuhxeKOs2gZyVy5D1BuZllmypMaWrWHtCIyaboNAdXjSD9nwSeBBeiISWWeUaVTJhtOwgWROsIjyZO0kL0aHcE1eObbZiwifwk_IkiZYMAzZ1TavAI4Cn-SLZ94PB9sptCb8o6RC9A2gHNV0diNGvOu6yO3thlGHsW-eY81ar_qcz6rhEFaHqUFEtheoO-UnS7RNg2Q4OpKhqEzAY9DoRxhUb5MFQ")
 
             await router.replace({
                 path: "/"

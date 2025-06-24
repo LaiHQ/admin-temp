@@ -329,20 +329,21 @@ async function handleHttpError(status: number, config: AxiosResponse) {
 }
 
 // 业务错误处理
-function handleAuthError(config: AxiosRequestConfig) {
-    const errorNumber = config.data?.code
-    const msg = config.data?.message
+function handleAuthError(config: AxiosRequestConfig,data:any) {
+    const errorNumber = data?.code
+    const msg = data?.message
     const authErrMap: any = {
-        "10031": "登录失效，需要重新登录", // token 失效
-        "10032": "您太久没登录，请重新登录~", // token 过期
-        "10033": "账户未绑定角色，请联系管理员绑定角色",
-        "10034": "该用户未注册，请联系管理员注册用户",
-        "10035": "code 无法获取对应第三方平台用户",
-        "10036": "该账户未关联员工，请联系管理员做关联",
-        "10037": "账号已无效",
-        "10038": "账号未找到"
+        "1002003014": "抱歉，您暂时还无访问权限",
     }
+    
     tipMsg(msg || authErrMap[errorNumber])
+
+    if([1002003014].includes(errorNumber)){
+        router.push({
+            path: "/error/401"
+        })
+    }
+
     reportErrorLog({
         type: "业务异常错误",
         info: generateReqKey(config),
@@ -362,6 +363,8 @@ http.interceptors.request.use(
         if (loading) globalLogin("show", loadingText)
         const token = localStorage.getItem("token")
         if (token) config.headers["Authorization"] = `Bearer ${token}`
+        // 平台标识
+        config.headers["Platform"] = import.meta.env.VITE_BASE_PLATFORM
         return config
     },
     (error) => Promise.reject(error)
@@ -383,7 +386,7 @@ http.interceptors.response.use(
                 // 是否需要提示
                 if (successMessage) tipMsg(response.data?.message, "success")
             } else {
-                handleAuthError(response.config)
+                handleAuthError(response.config,response.data)
                 return Promise.reject(response || {})
             }
         }

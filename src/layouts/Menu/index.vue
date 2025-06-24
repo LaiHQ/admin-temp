@@ -48,7 +48,6 @@ export default {
                             item.meta = Object.assign(item.meta, { hidden: true })
                         })
                     }
-
                     // 如果有下级并且下级需要在菜单显示则继续递归
                     if (item.children && !item.hideChildrenInMenu) {
                         newItem.children = getMenuData(item.children, [...parentKeys, item.path])
@@ -63,8 +62,12 @@ export default {
             })
             return menuData
         }
-        const handleMenuClick = ({ key }) => {
-            router.push({ path: `${key}` })
+        const handleMenuClick = (e) => {
+            const { isFrame, href, target } = e.item?.meta || {}
+            if (isFrame) {
+                target === "_blank" && window.open(href, target)
+            }
+            router.push({ path: `${e.key}` })
         }
         // 路由切换，页面初始化设置选中状态
         const setMenuKeys = (v) => {
@@ -79,7 +82,6 @@ export default {
         const updateMenu = () => {
             const routes = route.matched.concat()
             const { hidden } = route.meta
-
             if (routes.length >= 3 && hidden) {
                 routes.pop()
                 state.selectedKeys = [routes[routes.length - 1].path]
@@ -100,9 +102,12 @@ export default {
             () => {
                 return router.currentRoute.value.path
             },
-            () => {
-                // setMenuKeys(v)
+            (v) => {
+                // setMenuKeys(v)               
                 updateMenu()
+            },
+            {
+                immediate: true
             }
         )
 

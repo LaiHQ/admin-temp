@@ -5,11 +5,11 @@
 </template>
 
 <script setup>
-import {getSystemRouter} from "@/api"
+// import {getSystemRouter} from "@/api"
 
-http.get("/system/menu/getRouters",{}).then((res) => {
-    console.log(res)
-})
+// http.get("/system/menu/getRouters",{}).then((res) => {
+//     console.log(res)
+// })
 
 // getSystemRouter().then(res=>{
 //     console.log(res)

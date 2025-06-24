@@ -1,18 +1,10 @@
-<!--
- * @Descripttion: 404
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2023-03-07 11:40:08
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-06-15 14:29:16
--->
 <template>
     <div class="error">
         <div class="error-flex">
             <div class="left">
                 <div class="left-item">
                     <div class="left-item-animation left-item-num">404</div>
-                    <div class="left-item-animation left-item-title">地址输入错误，请重新输入地址~</div>
+                    <div class="left-item-animation left-item-title">{{ title }}</div>
                     <div class="left-item-animation left-item-msg">您可以先检查网址，然后重新输入或给我们反馈问题。</div>
                     <div class="left-item-animation left-item-btn">
                         <a-button type="primary" @click="onGoHome">返回首页</a-button>
@@ -28,6 +20,12 @@
 </template>
 
 <script setup>
+const props = defineProps({
+    title: {
+        type: String,
+        default: "地址输入错误，请重新输入地址~"
+    }
+})
 const router = useRouter()
 const onGoHome = () => {
     router.replace("/")
