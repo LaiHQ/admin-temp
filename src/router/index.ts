@@ -123,6 +123,7 @@ const asyncRouterMap: Array<RouteRecordRaw> = [
                         meta: {
                             title: "用户管理"
                         },
+
                         component: () => import("@/views/system/users/index.vue")
                     },
                     {
