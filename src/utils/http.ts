@@ -16,33 +16,35 @@
  * @LastEditors: lai_hq@qq.com
  * @LastEditTime: 2025-06-20 18:11:11
  */
-import axios, { AxiosRequestConfig, AxiosResponse, Canceler, AxiosAdapter } from "axios"
+import { EventSourceParserStream } from "eventsource-parser/stream"
+import axios, { AxiosRequestConfig, AxiosResponse, Canceler, AxiosAdapter, AxiosInstance, InternalAxiosRequestConfig } from "axios"
 import router from "@/router"
 import { message } from "ant-design-vue"
 import Qs from "qs"
 import { globalLogin, debounce, reportErrorLog } from "@/utils/index"
+import { ref, Ref } from "vue"
 
 // 增强配置
-// interface CustomAxiosRequestConfig {
-//     // 开启loading
-//     loading: boolean
-//     // loading 文字
-//     loadingText: string
-//     // 请求成功提示
-//     successMessage: boolean
-//     // 重试次数
-//     retryTimes: number
-//     // 重试延迟时间
-//     retryDelay: number
-//     // 缓存的最大时间
-//     maxAge: number
-//     // 是否开启缓存
-//     enabledByDefault: boolean
-//     // 配置请求 config 对象上的缓存属性
-//     cacheFlag: string
-//     // 缓存对象
-//     defaultCache: object
-// }
+interface CustomAxiosRequestConfig {
+    // 开启loading
+    loading: boolean
+    // loading 文字
+    loadingText: string
+    // 请求成功提示
+    successMessage: boolean
+    // 重试次数
+    retryTimes: number
+    // 重试延迟时间
+    retryDelay: number
+    // 缓存的最大时间
+    maxAge: number
+    // 是否开启缓存
+    enabledByDefault: boolean
+    // 配置请求 config 对象上的缓存属性
+    cacheFlag: string
+    // 缓存对象
+    defaultCache: object
+}
 /**
  * @description: message提示
  * @param {string} msg 提示文字
@@ -51,6 +53,13 @@ import { globalLogin, debounce, reportErrorLog } from "@/utils/index"
 const tipMsg = debounce((msg: string, type: "success" | "info" | "warning" | "error" | "loading" = "error") => {
     message[type] && message[type](msg)
 }, 1000)
+
+type SSEResponse = {
+    stop: () => void
+    done: Ref<boolean>
+    answer: Ref<{ data: string; [key: string]: any }>
+    response: Response
+}
 
 const http = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL as string,
@@ -66,7 +75,100 @@ const http = axios.create({
     withCredentials: true
     // headers: { 'Content-Type': 'application/json' },
     // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-})
+}) as AxiosInstance & {
+    sse: <T = string>(
+        // eslint-disable-next-line no-unused-vars
+        url: string,
+        // eslint-disable-next-line no-unused-vars
+        params?: Record<string, any>,
+        // eslint-disable-next-line no-unused-vars
+        options?: {
+            // eslint-disable-next-line no-unused-vars
+            onMessage?: (data: T) => void
+            // eslint-disable-next-line no-unused-vars
+            onError?: (error: Error) => void
+            signal?: AbortSignal
+            // eslint-disable-next-line no-unused-vars
+            parser?: (raw: string) => T // 自定义解析器
+        }
+    ) => Promise<SSEResponse>
+}
+
+http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
+    try {
+        const done = ref(false)
+        const answer = ref<{ data: string; [key: string]: any }>({ data: "" })
+
+        const token = localStorage.getItem("token")
+        const response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify(params),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            signal
+        })
+        if (!response.ok) {
+            throw new Error(`SSE连接失败: ${response.statusText}`)
+        }
+
+        if (!response.body) {
+            throw new Error("没有可读的响应体")
+        }
+
+        // 使用 TextDecoder 处理流
+        const reader = response?.body?.pipeThrough(new TextDecoderStream()).pipeThrough(new EventSourceParserStream()).getReader()
+
+        const processStream = async () => {
+            // eslint-disable-next-line no-constant-condition
+            while (true) {
+                const x = await reader?.read()
+                if (x) {
+                    const { done: isDone, value } = x
+                    try {
+                        const val = JSON.parse(value?.data || "{}")
+                        const d = val?.data
+                        if (typeof d !== "boolean" && d !== undefined && d.data !== "") {
+                            onMessage?.(d)
+                            answer.value = d
+                        }
+                    } catch (e) {
+                        console.warn(e)
+                        done.value = true
+                    }
+                    if (isDone) {
+                        done.value = true
+                        // console.info("done")
+                        break
+                    }
+                }
+            }
+        }
+
+        processStream().catch((error) => {
+            onError?.(error instanceof Error ? error : new Error(String(error)))
+        })
+
+        // 返回断开连接的函数
+        return {
+            done,
+            answer,
+            stop: () => {
+                done.value = true
+                console.log("stop")
+                reader.cancel().catch(() => {
+                    console.error("SSE 连接断开失败")
+                })
+            },
+            response
+        }
+    } catch (error) {
+        onError?.(error instanceof Error ? error : new Error(String(error)))
+        throw error
+    }
+}
+
 // 设置post请求头
 http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8"
 
@@ -329,16 +431,16 @@ async function handleHttpError(status: number, config: AxiosResponse) {
 }
 
 // 业务错误处理
-function handleAuthError(config: AxiosRequestConfig,data:any) {
+function handleAuthError(config: AxiosRequestConfig, data: any) {
     const errorNumber = data?.code
     const msg = data?.message
     const authErrMap: any = {
-        "1002003014": "抱歉，您暂时还无访问权限",
+        "1002003014": "抱歉，您暂时还无访问权限"
     }
-    
+
     tipMsg(msg || authErrMap[errorNumber])
 
-    if([1002003014].includes(errorNumber)){
+    if ([1002003014].includes(errorNumber)) {
         router.push({
             path: "/error/401"
         })
@@ -354,7 +456,7 @@ function handleAuthError(config: AxiosRequestConfig,data:any) {
 // 添加请求拦截器
 http.interceptors.request.use(
     (config) => {
-        const { loading, loadingText } = config
+        const { loading, loadingText } = config as InternalAxiosRequestConfig & CustomAxiosRequestConfig
         // debugger
         // 检查是否存在重复请求，若存在则取消已发的请求
         removePendingRequest(config)
@@ -373,7 +475,7 @@ http.interceptors.request.use(
 // 添加响应拦截器
 http.interceptors.response.use(
     (response) => {
-        const { loading, successMessage } = response.config        
+        const { loading, successMessage } = response.config as InternalAxiosRequestConfig & CustomAxiosRequestConfig
         // 从pendingRequest对象中移除请求
         removePendingRequest(response.config)
         if (loading) globalLogin("hide")
@@ -386,7 +488,7 @@ http.interceptors.response.use(
                 // 是否需要提示
                 if (successMessage) tipMsg(response.data?.message, "success")
             } else {
-                handleAuthError(response.config,response.data)
+                handleAuthError(response.config, response.data)
                 return Promise.reject(response || {})
             }
         }
@@ -421,3 +523,42 @@ http.interceptors.response.use(
 )
 
 export default http
+
+//
+// 使用示例
+// const abortController = new AbortController();
+// http.sse('/api/sse-stream', { userId: '123' }, {
+//   onMessage: (data) => {
+//     console.log('收到消息:', data);
+//   },
+//   onError: (error) => {
+//     console.error('SSE错误:', error);
+//   },
+//   signal: abortController.signal
+// }).then(disconnect => {
+//   // 5秒后断开连接
+//   setTimeout(() => {
+//     disconnect();
+//     // 或者使用 abortController.abort();
+//   }, 5000);
+// });
+//
+// 使用自定义解析器
+// http.sse('/api/sse', {}, {
+//   onMessage: (data) => {
+//     console.log(data); // 已经是解析后的对象
+//   },
+//   parser: JSON.parse
+// });
+
+// const params = {
+//         query: "你好"
+//     }
+//     const { stop, done, answer } = await http.sse("http://localhost:3000/ai/stream", params)
+//     watch([done, answer], ([loading, data]) => {
+//         if (!loading) {
+//             console.log(data)
+//         } else {
+//             state.done = loading
+//         }
+//     })

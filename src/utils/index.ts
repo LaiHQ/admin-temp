@@ -90,3 +90,30 @@ export function globalLogin(display: "show" | "hide", tip?: string) {
 export function setRootVariable(name: string, value: string) {
     document.documentElement.style.setProperty(name, value)
 }
+
+export function trim(string: string, chars?: string) {
+    if (string === null) {
+        return ""
+    }
+
+    const str = String(string)
+
+    // 如果没有指定chars，使用默认的空白字符
+    if (chars === undefined) {
+        return str.trim()
+    }
+
+    // 处理空字符串情况
+    if (chars === "") {
+        return str
+    }
+
+    const escapedChars = escapeRegExp(chars)
+    const pattern = new RegExp(`^[${escapedChars}]+|[${escapedChars}]+$`, "g")
+
+    return str.replace(pattern, "")
+}
+
+function escapeRegExp(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}

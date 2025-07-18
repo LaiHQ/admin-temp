@@ -303,16 +303,16 @@ const generator = (routerMap: any[], parent?: object | null) => {
 
 async function initRouters(user: any) {
     // 前端路由
-    // const permission = asyncRouterMap[0]
-    // user.setPermission(asyncRouterMap)
-    // router.addRoute(permission)
+    const permission = asyncRouterMap[0]
+    user.setPermission(asyncRouterMap)
+    router.addRoute(permission)
 
     // 后端路由
-    const { data } = await getSystemRouter()
-    console.log("生成的", generator(data))
-    rootRouter.children = [...generator(data), ...rootRouter.children]
-    user.setPermission([rootRouter])
-    router.addRoute(rootRouter)
+    // const { data } = await getSystemRouter()
+    // console.log("生成的", generator(data))
+    // rootRouter.children = [...generator(data), ...rootRouter.children]
+    // user.setPermission([rootRouter])
+    // router.addRoute(rootRouter)
 }
 
 router.beforeEach(async (to, from, next) => {

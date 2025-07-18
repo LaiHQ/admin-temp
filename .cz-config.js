@@ -1,11 +1,3 @@
-/*
- * @Descripttion:
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2022-08-01 11:32:37
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-02-24 20:36:11
- */
 module.exports = {
     // type 类型（定义之后，可通过上下键选择）
     types: [

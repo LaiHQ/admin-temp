@@ -14,9 +14,10 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate"
 import router from "./router"
 import "animate.css/animate.min.css"
 import { name, version } from "../package.json"
-import "./style/reset.css"
+
 import "virtual:svg-icons-register"
 import { HomeOutlined, UnorderedListOutlined, SettingOutlined } from "@ant-design/icons-vue"
+import "./style/reset.css"
 
 
 const app = createApp(App)

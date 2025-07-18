@@ -16,9 +16,26 @@
                         </template>
                     </a-switch>
                 </a-tooltip>
+                <a-dropdown arrow placement="bottom" :trigger="['click']">
+                    <a-tooltip placement="top">
+                        <template #title>
+                            <span>主题色</span>
+                        </template>
+                        <a-button type="text">
+                            <template #icon>
+                                <div :style="{ backgroundColor: system.primaryColor, width: '20px', height: '20px', margin: 'auto', borderRadius: '4px' }"></div>
+                            </template>
+                        </a-button>
+                    </a-tooltip>
+                    <template #overlay>
+                        <a-menu>
+                            <a-menu-item disabled style="padding: 0">
+                                <SketchPicker v-model="system.primaryColor" @update:modelValue="changePrimary" />
+                            </a-menu-item>
+                        </a-menu>
+                    </template>
+                </a-dropdown>
 
-                <a-input v-model:value="system.primaryColor" type="color"
-                    style="width: 28px; height: 28px; padding: 2px; margin-right: 10px" @change="changePrimary" />
                 <a-tooltip placement="bottom">
                     <template #title>
                         <span>开发文档</span>
@@ -75,6 +92,9 @@ import { useRouter } from "vue-router"
 import useStore from "@/store"
 import { debounce } from "@/utils"
 
+import { SketchPicker } from "vue-color"
+import "vue-color/style.css"
+
 export default defineComponent({
     name: "User",
     components: {
@@ -83,13 +103,15 @@ export default defineComponent({
         KeyOutlined,
         SettingOutlined,
         PoweroffOutlined,
-        BugOutlined
+        BugOutlined,
+        SketchPicker
     },
     setup() {
         const state = reactive({
             avatar: "",
             nickname: "张三",
-            userVisible: false
+            userVisible: false,
+            color: ""
         })
         const { system } = useStore()
         const userVisibleChange = (v) => {
@@ -119,8 +141,7 @@ export default defineComponent({
         const isDev = import.meta.env.MODE === "development"
 
         const changePrimary = debounce((e) => {
-            // console.log(e.target.value)
-            system.setPrimaryColor(e.target.value)
+            system.setPrimaryColor(e)
         }, 500)
 
         return {
