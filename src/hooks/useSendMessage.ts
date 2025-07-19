@@ -99,6 +99,7 @@ export const useSelectDerivedMessages = () => {
             {
                 role: "assistant",
                 content: answer,
+                timestamp: new Date().getTime(),
                 id: uuid()
             }
         ])
@@ -124,9 +125,9 @@ export const useSendMessage = (conversationId: string) => {
     const { loading, send, answer, disconnect } = useSendMessageWithSse("http://localhost:3000/ai/stream")
     const { derivedMessages, addNewestQuestion, addNewestAnswer, refDom, setDerivedMessages } = useSelectDerivedMessages()
 
-    const toBottom = () => {
+    const toBottom = (behavior: "auto" | "instant" | "smooth" = "instant") => {
         nextTick(() => {
-            refDom.value?.scrollIntoView({ behavior: "instant" })
+            refDom.value?.scrollIntoView({ behavior })
             autoScrollEnabled.value = true
         })
     }
@@ -146,7 +147,8 @@ export const useSendMessage = (conversationId: string) => {
             {
                 content: value.value,
                 id: uuid,
-                role: "user"
+                role: "user",
+                timestamp: new Date().getTime()
             },
             "思考中🤔"
         )
@@ -201,6 +203,7 @@ export const useSendMessage = (conversationId: string) => {
         refDom,
         loading,
         derivedMessages,
-        disconnect
+        disconnect,
+        handleToBottom: toBottom
     }
 }

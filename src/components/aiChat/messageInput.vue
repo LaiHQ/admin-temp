@@ -1,7 +1,6 @@
 <template>
     <div class="message-input">
         <a-textarea :bordered="false" :value="modelValue" @change="handleInputChange" @pressEnter="handlePressEnter" placeholder="请输入" :auto-size="{ minRows: 3, maxRows: 10 }" />
-
         <div class="input-footer">
             <div class="model"></div>
             <div class="handle">
@@ -19,6 +18,12 @@
                 </a-button>
             </div>
         </div>
+        <!--  -->
+        <div class="go-bottom" v-show="!autoScrollEnabled">
+            <a-button shape="circle" @click="handleToBottom('smooth')">
+                <DownOutlined />
+            </a-button>
+        </div>
     </div>
 </template>
 
@@ -33,12 +38,13 @@ const props = defineProps({
         default: ""
     },
     handleInputChange: {
-        type: Function,
-        default: () => {}
+        type: Function
     },
     handlePressEnter: {
-        type: Function,
-        default: () => {}
+        type: Function
+    },
+    handleToBottom: {
+        type: Function
     },
     loading: {
         type: Boolean,
@@ -46,6 +52,10 @@ const props = defineProps({
     },
     disconnect: {
         type: Function
+    },
+    autoScrollEnabled: {
+        type: Boolean,
+        default: true
     }
 })
 
@@ -70,10 +80,18 @@ onMounted(() => {
     padding-bottom: 10px;
     padding-inline: 10px;
     padding-top: 10px;
+    position: relative;
 
     .input-footer {
         display: flex;
         justify-content: space-between;
+    }
+
+    .go-bottom {
+        position: absolute;
+        top: -42px;
+        left: 50%;
+        margin-left: -16px;
     }
 }
 </style>

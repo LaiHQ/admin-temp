@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <AiChat height="400px"></AiChat>
+        <AiChat height="400px" style="border: 1px solid #e5e5e5;"></AiChat>
     </div>
 </template>
 

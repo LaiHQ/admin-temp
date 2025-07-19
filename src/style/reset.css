@@ -1,11 +1,12 @@
 
 
 body {
-	font: 16px/1 "PingFang SC", "Microsoft YaHei", sans-serif;
+	font: "PingFang SC", "Microsoft YaHei", sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	margin: 0;
 	padding: 0;
+
 }
 
 p{

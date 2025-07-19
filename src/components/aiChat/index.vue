@@ -11,7 +11,7 @@
             </template>
             <div ref="refDom" />
         </div>
-        <MessageInput v-model="value" :handleInputChange="handleInputChange" :loading="loading" :disconnect="disconnect" :handlePressEnter="handlePressEnter"> </MessageInput>
+        <MessageInput v-model="value" :handleToBottom="handleToBottom" :handleInputChange="handleInputChange" :autoScrollEnabled="autoScrollEnabled" :loading="loading" :disconnect="disconnect" :handlePressEnter="handlePressEnter"> </MessageInput>
     </div>
 </template>
 
@@ -34,7 +34,7 @@ const userInfo = computed(() => {
     }
 })
 
-const { value, handleInputChange, handlePressEnter, refDom, loading, derivedMessages, disconnect, setDerivedMessages, autoScrollEnabled, handleScroll } = useSendMessage()
+const { value, handleInputChange, handlePressEnter,handleToBottom, refDom, loading, derivedMessages, disconnect, setDerivedMessages, autoScrollEnabled, handleScroll } = useSendMessage()
 </script>
 
 <style lang="less" scoped>
@@ -52,12 +52,19 @@ const { value, handleInputChange, handlePressEnter, refDom, loading, derivedMess
     transition: scrollbar-color 0.1s ease-out;
     &::-webkit-scrollbar {
         width: 5px;
-        background-color: #f5f7fa;
+        // background-color: #f5f7fa;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: #d9d9d9;
+        // background-color: #d9d9d9;
         border-radius: 10px;
+    }
+
+    &:hover {
+        transition: all 0.1s ease-out;
+        &::-webkit-scrollbar-thumb {
+            background-color: #d9d9d9;
+        }
     }
 }
 </style>

@@ -4,7 +4,12 @@
             <section :class="['item-section', itemClass('item-section', item)]">
                 <div class="item-content">
                     <div class="item-avatar">
-                        <img v-if="isUser(item)" class="avatar-img" :src="avatar" alt="" />
+                        <a-avatar v-if="isUser(item)" :src="avatar">
+                            <template #icon v-if="!avatar">
+                                <UserOutlined />
+                            </template>
+                        </a-avatar>
+
                         <img v-else class="avatar-img" src="https://file.1d1j.cn/ai-icon/ai-avatar.png" alt="" />
                     </div>
 
@@ -14,7 +19,7 @@
                         </div>
                         <div class="item-text">
                             <template v-if="isUser(item)">
-                                <p>{{ item.content }}</p>
+                                {{ item.content }}
                             </template>
                             <Markdown v-else :content="item.content" />
                         </div>
@@ -92,9 +97,11 @@ const isUser = computed(
         .item-text {
             padding: 0 10px;
             border-radius: 4px;
-            background-color: #fff;
+            background-color: rgba(0, 0, 0, 0.04);
             word-break: break-all;
             min-height: 32px;
+            font-size: 16px;
+            padding-top: 10px;
         }
     }
 
@@ -112,7 +119,7 @@ const isUser = computed(
     }
 
     .item-section-right {
-        width: 80%;
+        width: 90%;
         overflow: hidden;
 
         .item-content {
@@ -123,7 +130,7 @@ const isUser = computed(
             word-break: break-all;
             text-align: justify;
             font-family: PingFangSC, PingFang SC;
-            font-size: 14px;
+            padding-top: 5px;
         }
     }
 }
