@@ -98,7 +98,6 @@ http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
     try {
         const done = ref(false)
         const answer = ref<{ data: string; [key: string]: any }>({ data: "" })
-
         const token = localStorage.getItem("token")
         const response = await fetch(url, {
             method: "POST",
@@ -122,6 +121,11 @@ http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
 
         const processStream = async () => {
             // eslint-disable-next-line no-constant-condition
+            let buffer = ""
+            let inThink = false
+            let [thinkStartTimestamp, thinkEndTimestamp] = [0, 0]
+            let thinkDuration = 0
+
             while (true) {
                 const x = await reader?.read()
                 if (x) {
@@ -130,8 +134,46 @@ http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
                         const val = JSON.parse(value?.data || "{}")
                         const d = val?.data
                         if (typeof d !== "boolean" && d !== undefined && d.data !== "") {
-                            onMessage?.(d)
-                            answer.value = d
+                            buffer += d.data
+                            if (!inThink) {
+                                const thinkStart = buffer.indexOf("<think>")
+                                if (thinkStart !== -1) {
+                                    buffer = buffer.slice(thinkStart + 7).trim()
+                                    inThink = true
+                                    thinkStartTimestamp = new Date().getTime()
+                                } else {
+                                    const obj = {
+                                        ...d,
+                                        inThink
+                                    }
+                                    if (thinkDuration > 0) {
+                                        obj.thinkDuration = thinkDuration
+                                    }
+                                    onMessage?.(obj)
+                                    answer.value = obj
+                                    // console.log(buffer)
+                                }
+                            } else {
+                                const thinkEnd = buffer.indexOf("</think>")
+                                if (thinkEnd !== -1) {
+                                    const thinkContent = buffer.substring(0, thinkEnd)
+                                    buffer = buffer.slice(thinkEnd + 8).trim()
+                                    thinkEndTimestamp = new Date().getTime()
+                                    thinkDuration = Math.round((thinkEndTimestamp - thinkStartTimestamp) / 1000)
+                                    console.log("【思考完成】：", thinkDuration, thinkContent)
+                                    inThink = false
+                                } else {
+                                    const obj = {
+                                        ...d,
+                                        inThink
+                                    }
+                                    onMessage?.(obj)
+                                    answer.value = obj
+                                    // console.log("【思考中】：", buffer)
+                                }
+                            }
+                            // onMessage?.(d)
+                            // answer.value = d
                         }
                     } catch (e) {
                         console.warn(e)

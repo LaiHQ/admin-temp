@@ -1,15 +1,17 @@
 <template>
-    <div ref="markdownPreviewRef" class="markdown-content" v-html="formatValue()"></div>
+    <div ref="markdownPreviewRef" class="markdown-content"></div>
 </template>
 
 <script setup name="YMarkdownContent">
-
 import { Marked } from "marked"
 import { markedHighlight } from "marked-highlight"
 import hljs from "highlight.js"
 import "highlight.js/styles/atom-one-dark.css"
 import katex from "katex"
 import "katex/dist/katex.min.css"
+import { watch } from "vue"
+
+const markdownPreviewRef = ref(null)
 
 const props = defineProps({
     content: {
@@ -100,12 +102,21 @@ const markdown = new Marked(
         }
     })
 )
-
-const formatValue = () => {
-    return markdown.parse(props.content)
-}
-
-const markdownPreviewRef = ref(null)
+let outputQueue = ""
+watch(
+    () => props.content,
+    (text) => {
+        outputQueue += text
+        if (!window._outputPending) {
+            window._outputPending = true
+            requestAnimationFrame(() => {
+                markdownPreviewRef.value.innerHTML = markdown.parse(outputQueue)
+                outputQueue = ""
+                window._outputPending = false
+            })
+        }
+    }
+)
 
 defineExpose({ markdownPreviewRef })
 </script>

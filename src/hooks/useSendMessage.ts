@@ -93,12 +93,15 @@ export const useSelectDerivedMessages = () => {
         ])
     }
 
-    const addNewestAnswer = (answer: string) => {
+    const addNewestAnswer = (answer: string, inThink = false, think = "", thinkDuration = 0) => {
         setDerivedMessages([
             ...(derivedMessages.value?.slice(0, -1) ?? []),
             {
                 role: "assistant",
-                content: answer,
+                content: inThink ? "" : answer,
+                think: inThink ? answer : think,
+                inThink,
+                thinkDuration,
                 timestamp: new Date().getTime(),
                 id: uuid()
             }
@@ -150,7 +153,7 @@ export const useSendMessage = (conversationId: string) => {
                 role: "user",
                 timestamp: new Date().getTime()
             },
-            "思考中🤔"
+            "..."
         )
         // 3.清空输入框
         value.value = ""
@@ -182,13 +185,21 @@ export const useSendMessage = (conversationId: string) => {
         }
     }
     let _temp = ""
+    let _temp_think = ""
     watch([answer, loading], ([val, isEnd]) => {
         if (!isEnd) {
             _temp = ""
+            _temp_think = ""
         } else {
-            if (val.data) {
+            // 思考中
+            if (val.inThink) {
+                _temp_think += val.data
+                addNewestAnswer(_temp_think, val.inThink)
+                return
+            }
+            if (val.data && !val.inThink) {
                 _temp += val.data
-                addNewestAnswer(_temp)
+                addNewestAnswer(_temp, val.inThink, _temp_think, val.thinkDuration)
             }
         }
     })

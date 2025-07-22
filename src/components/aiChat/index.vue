@@ -34,7 +34,7 @@ const userInfo = computed(() => {
     }
 })
 
-const { value, handleInputChange, handlePressEnter,handleToBottom, refDom, loading, derivedMessages, disconnect, setDerivedMessages, autoScrollEnabled, handleScroll } = useSendMessage()
+const { value, handleInputChange, handlePressEnter, handleToBottom, refDom, loading, derivedMessages, disconnect, setDerivedMessages, autoScrollEnabled, handleScroll } = useSendMessage()
 </script>
 
 <style lang="less" scoped>
