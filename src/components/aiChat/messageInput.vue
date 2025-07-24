@@ -1,8 +1,35 @@
 <template>
     <div class="message-input">
-        <a-textarea :bordered="false" :value="modelValue" @change="handleInputChange" @pressEnter="handlePressEnter" placeholder="请输入" :auto-size="{ minRows: 3, maxRows: 10 }" />
+        <!-- menu -->
+        <div class="menu">
+            <div class="menu-item">
+                <AudioOutlined />
+            </div>
+            <div class="menu-item">
+                <a-upload>
+                    <PictureOutlined />
+                </a-upload>
+            </div>
+            <div class="menu-item">
+                <VideoCameraOutlined />
+            </div>
+            <div class="menu-item">
+                <UploadOutlined />
+            </div>
+            <!-- <AudioMutedOutlined /> -->
+        </div>
+        <!--  -->
+        <a-textarea class="textarea" :bordered="false" :value="modelValue" @change="handleInputChange" @pressEnter="handlePressEnter" placeholder="请输入" :auto-size="{ minRows: 3, maxRows: 10 }" />
         <div class="input-footer">
-            <div class="model"></div>
+            <div class="model">
+                <a-space>
+                    <a-select style="width: 120px" v-model:value="state.model">
+                        <a-select-option value="DeepSeek">DeepSeek</a-select-option>
+                    </a-select>
+                    <a-button :type="state.think ? 'primary' : 'default'" :ghost="state.think" @click="state.think = !state.think">深度思考</a-button>
+                    <a-button :type="state.network ? 'primary' : 'default'" :ghost="state.network" @click="state.network = !state.network">联网搜索</a-button>
+                </a-space>
+            </div>
             <div class="handle">
                 <a-button v-if="!loading && isEmpty && !disconnect" type="primary" shape="circle" :disabled="isEmpty" @click="handlePressEnter">
                     <ArrowUpOutlined />
@@ -24,13 +51,15 @@
                 <DownOutlined />
             </a-button>
         </div>
+        <!--  -->
+        <div class="tip-brand">服务生成的所有内容均由人工智能模型生成，其生成内容的准确性和完整性无法保证，不代表我们的态度或观点</div>
     </div>
 </template>
 
 <script setup>
 import { onMounted, reactive } from "vue"
 import { trim } from "@/utils"
-import { ArrowUpOutlined, LoadingOutlined, PauseCircleOutlined } from "@ant-design/icons-vue"
+import { ArrowUpOutlined, LoadingOutlined, PauseCircleOutlined, AudioOutlined, AudioMutedOutlined, PictureOutlined, VideoCameraOutlined, UploadOutlined } from "@ant-design/icons-vue"
 
 const props = defineProps({
     modelValue: {
@@ -61,7 +90,11 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"])
 
-const state = reactive({})
+const state = reactive({
+    model: "deepseek",
+    think: false,
+    network: false
+})
 
 const isEmpty = computed(() => trim(props.modelValue) === "")
 
@@ -74,17 +107,41 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .message-input {
-    margin-right: 12px;
-    border: 1px solid #dce0e9;
-    border-radius: 8px;
+    border-top: 1px solid #e7e7e7;
+    // border-radius: 8px;
+    //  margin-right: 12px;
     padding-bottom: 10px;
-    padding-inline: 10px;
-    padding-top: 10px;
+    // padding-inline: 10px;
+    // padding-top: 10px;
     position: relative;
+    background-color: rgb(248, 249, 250);
+    .textarea {
+        padding: 5px 16px;
+    }
+
+    .menu {
+        padding: 12px 20px;
+        display: flex;
+        .menu-item {
+            padding: 6px;
+            margin-right: 16px;
+            cursor: pointer;
+            font-size: 16px;
+            color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            &:hover {
+                background-color: rgba(48, 50, 54, 0.05);
+                border-radius: 4px;
+                transition: all 0.3s;
+            }
+        }
+    }
 
     .input-footer {
         display: flex;
         justify-content: space-between;
+        padding: 0 16px 10px 16px;
     }
 
     .go-bottom {
@@ -92,6 +149,14 @@ onMounted(() => {
         top: -42px;
         left: 50%;
         margin-left: -16px;
+    }
+
+    .tip-brand {
+        font-size: 12px;
+        color: #00000042;
+        text-align: center;
+        padding: 0 20px;
+        // padding-top: 12px;
     }
 }
 </style>
