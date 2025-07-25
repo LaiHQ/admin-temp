@@ -38,6 +38,8 @@ import MessageItem from "@/components/aiChat/messageItem.vue"
 import MessageInput from "@/components/aiChat/messageInput.vue"
 import { EllipsisOutlined } from "@ant-design/icons-vue"
 
+import http from "@/utils/http"
+
 const props = defineProps({
     height: {
         type: String,
@@ -56,6 +58,13 @@ const userInfo = computed(() => {
 })
 
 const { value, handleInputChange, handlePressEnter, handleToBottom, refDom, loading, derivedMessages, disconnect, setDerivedMessages, autoScrollEnabled, handleScroll } = useSendMessage()
+
+
+onMounted(()=>{
+    // http.get("http://localhost:11434/api/tags",{}).then(res=>{
+    //     console.log(res)
+    // })
+})
 </script>
 
 <style lang="less" scoped>

@@ -26,6 +26,7 @@ declare module '@vue/runtime-core' {
     AiChat: typeof import('./../src/components/aiChat/index.vue')['default']
     AiChatMessageInput: typeof import('./../src/components/aiChat/messageInput.vue')['default']
     AiChatMessageItem: typeof import('./../src/components/aiChat/messageItem.vue')['default']
+    AiChatUtils: typeof import('./../src/components/aiChat/utils.js')['default']
     AInput: typeof import('ant-design-vue/es')['Input']
     AInputPassword: typeof import('ant-design-vue/es')['InputPassword']
     ALayout: typeof import('ant-design-vue/es')['Layout']

@@ -2,7 +2,7 @@
     <div class="home">
         <AiChat height="400px" style="border: 1px solid #e5e5e5"></AiChat>
 
-        <!-- <div style="width: 792px; height: 1123px; border: 1px solid #333; position: relative; transform: scale(0.6); transform-origin: left top">
+        <!-- <div style="width: 792px; height: 1123px; border: 1px solid #333; position: relative; ">
             <div style="position: absolute; left: 600px; top: 700px; width: 200px; height: 200px; border: 1px solid #333"></div>
         </div>
 
@@ -17,6 +17,8 @@
                 style="position: absolute; border: 1px solid #333"
             ></div>
         </div> -->
+
+        <a-button @click="fn">截图</a-button>
     </div>
 </template>
 
@@ -37,6 +39,7 @@ import AiChat from "@/components/aiChat"
 const scale = parseFloat((792 / 375).toFixed(2))
 
 const state = reactive({})
+
 
 onMounted(() => {})
 </script>

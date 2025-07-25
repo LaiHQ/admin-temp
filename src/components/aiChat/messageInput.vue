@@ -2,13 +2,21 @@
     <div class="message-input">
         <!-- menu -->
         <div class="menu">
-            <div class="menu-item">
+            <div class="menu-item" @click="startRecording">
                 <AudioOutlined />
             </div>
             <div class="menu-item">
-                <a-upload>
+                <a-dropdown arrow placement="top" :trigger="['hover']">
                     <PictureOutlined />
-                </a-upload>
+                    <template #overlay>
+                        <a-menu @click="handleItemClick">
+                            <a-menu-item key="screenshot">截图</a-menu-item>
+                            <a-menu-item>
+                                <a-upload>上传图片</a-upload>
+                            </a-menu-item>
+                        </a-menu>
+                    </template>
+                </a-dropdown>
             </div>
             <div class="menu-item">
                 <VideoCameraOutlined />
@@ -61,6 +69,10 @@ import { onMounted, reactive } from "vue"
 import { trim } from "@/utils"
 import { ArrowUpOutlined, LoadingOutlined, PauseCircleOutlined, AudioOutlined, AudioMutedOutlined, PictureOutlined, VideoCameraOutlined, UploadOutlined } from "@ant-design/icons-vue"
 
+import { screenshot } from "@/components/aiChat/utils"
+
+import RecordRTC from "recordrtc"
+
 const props = defineProps({
     modelValue: {
         type: String,
@@ -97,6 +109,34 @@ const state = reactive({
 })
 
 const isEmpty = computed(() => trim(props.modelValue) === "")
+
+let recorder
+
+async function startRecording() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    recorder = new RecordRTC(stream, {
+        type: "audio",
+        mimeType: "audio/webm"
+    })
+    recorder.startRecording()
+}
+
+function stopRecording() {
+    recorder.stopRecording(() => {
+        const blob = recorder.getBlob()
+        const url = URL.createObjectURL(blob)
+        // 使用或下载录音
+    })
+}
+
+function handleItemClick(e) {
+    if (e.key === "screenshot") {
+        // console.log("截图")
+        screenshot((image) => {
+            console.log(image)
+        })
+    }
+}
 
 function init() {}
 
