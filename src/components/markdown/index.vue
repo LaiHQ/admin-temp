@@ -110,6 +110,7 @@ watch(
         if (!window._outputPending) {
             window._outputPending = true
             requestAnimationFrame(() => {
+                debugger
                 markdownPreviewRef.value.innerHTML = markdown.parse(outputQueue)
                 outputQueue = ""
                 window._outputPending = false

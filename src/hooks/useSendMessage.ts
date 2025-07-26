@@ -153,7 +153,7 @@ export const useSendMessage = (conversationId: string) => {
                 role: "user",
                 timestamp: new Date().getTime()
             },
-            "..."
+            "<span>...</span>"
         )
         // 3.清空输入框
         value.value = ""
