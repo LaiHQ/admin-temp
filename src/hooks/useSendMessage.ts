@@ -78,7 +78,7 @@ export const useSelectDerivedMessages = () => {
 
     const refDom = useScrollToBottom(derivedMessages)
 
-    const addNewestQuestion = (message = {}, answer = "") => {
+    const addNewestQuestion = (message = {}, answer?: string) => {
         setDerivedMessages([
             ...derivedMessages.value,
             {
@@ -152,8 +152,12 @@ export const useSendMessage = (conversationId: string) => {
                 id: uuid,
                 role: "user",
                 timestamp: new Date().getTime()
+<<<<<<< HEAD
             },
             "<span>...</span>"
+=======
+            }
+>>>>>>> 96872ebad5c3b658810472e8482ffc89297e780d
         )
         // 3.清空输入框
         value.value = ""
@@ -193,12 +197,13 @@ export const useSendMessage = (conversationId: string) => {
         } else {
             // 思考中
             if (val.inThink) {
-                _temp_think += val.data
+                _temp_think += val.data.trim()
                 addNewestAnswer(_temp_think, val.inThink)
                 return
             }
             if (val.data && !val.inThink) {
                 _temp += val.data
+                _temp_think = _temp_think.trim()
                 addNewestAnswer(_temp, val.inThink, _temp_think, val.thinkDuration)
             }
         }
