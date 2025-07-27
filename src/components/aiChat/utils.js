@@ -70,92 +70,155 @@ export async function copyText(text) {
 
 
 
-const speechUtils = {
+export const speech = {
+    _utterance: null,       // 当前语音实例
+    _isPlaying: false,      // 是否正在播放
+    _isPaused: false,       // 是否处于暂停状态
+
     /**
-     * 播放文字
-     * @param {string} text - 要播放的文字
-     * @param {object} [options] - 选项
+     * 播放文本语音
+     * @param {string} text - 要朗读的文本
+     * @param {object} [options] - 配置选项
+     * @param {number} [options.rate=1] - 语速 (0.1-10)
+     * @param {number} [options.pitch=1] - 音高 (0-2)
+     * @param {number} [options.volume=1] - 音量 (0-1)
+     * @param {string} [options.lang="zh-CN"] - 语言代码
+     * @param {string} [options.voice] - 指定语音名称或语言代码
+     * @returns {Promise<void>} 播放完成后resolve
      */
-    speak(text, options = {}) {
+    async play(text, options = {}) {
+        // 停止当前播放
+        this.stop();
+
+        if (!window.speechSynthesis) {
+            throw new Error("浏览器不支持语音合成功能");
+        }
+
         return new Promise((resolve, reject) => {
-            if (!window.speechSynthesis) {
-                reject(new Error("Speech synthesis not supported"))
-                return
-            }
+            this._utterance = new SpeechSynthesisUtterance(text);
+            this._isPlaying = true;
+            this._isPaused = false;
 
-            const utterance = new SpeechSynthesisUtterance(text)
+            // 设置语音参数
+            this._utterance.rate = options.rate || 1.2;      // 语速
+            this._utterance.pitch = options.pitch || 1;     // 音调
+            this._utterance.volume = options.volume || 1;  // 音量
+            this._utterance.lang = options.lang || "zh-CN"; // 语言
 
-            // 设置参数
-            utterance.rate = options.rate || 1
-            utterance.pitch = options.pitch || 1
-            utterance.volume = options.volume || 1
-            utterance.lang = options.lang || "zh-CN"
-
-            // 语音选择
+            // 选择指定语音
             if (options.voice) {
-                const voices = speechSynthesis.getVoices()
-                const selectedVoice = voices.find((v) => v.name === options.voice || v.lang === options.voice)
-                if (selectedVoice) utterance.voice = selectedVoice
+                const voices = speechSynthesis.getVoices();
+                const selectedVoice = voices.find(
+                    (v) => v.name === options.voice || v.lang === options.voice
+                );
+                if (selectedVoice) this._utterance.voice = selectedVoice;
             }
 
-            // 事件处理
-            utterance.onend = () => resolve()
-            utterance.onerror = (event) => reject(event.error)
+            // 播放结束事件
+            this._utterance.onend = () => {
+                this._isPlaying = false;
+                resolve();
+            };
+            
+            // 播放错误事件
+            this._utterance.onerror = (event) => {
+                this._isPlaying = false;
+                reject(event.error);
+            };
 
-            speechSynthesis.speak(utterance)
-        })
+            // 开始播放
+            speechSynthesis.speak(this._utterance);
+        });
     },
 
     /**
      * 停止当前播放
      */
     stop() {
-        speechSynthesis.cancel()
+        if (this._isPlaying) {
+            speechSynthesis.cancel();
+            this._isPlaying = false;
+            this._isPaused = false;
+            this._utterance = null;
+        }
     },
 
     /**
-     * 暂停当前播放
+     * 暂停播放
      */
     pause() {
-        speechSynthesis.pause()
+        if (this._isPlaying && !this._isPaused) {
+            speechSynthesis.pause();
+            this._isPaused = true;
+        }
     },
 
     /**
      * 继续播放
      */
     resume() {
-        speechSynthesis.resume()
+        if (this._isPlaying && this._isPaused) {
+            speechSynthesis.resume();
+            this._isPaused = false;
+        }
     },
 
     /**
      * 获取可用语音列表
+     * @returns {Promise<SpeechSynthesisVoice[]>} 可用的语音列表
      */
     getVoices() {
         return new Promise((resolve) => {
-            const voices = speechSynthesis.getVoices()
+            const voices = speechSynthesis.getVoices();
             if (voices.length) {
-                resolve(voices)
+                resolve(voices);
             } else {
+                // 如果语音列表未加载，等待加载完成
                 speechSynthesis.onvoiceschanged = () => {
-                    resolve(speechSynthesis.getVoices())
-                }
+                    resolve(speechSynthesis.getVoices());
+                };
             }
-        })
+        });
+    },
+
+    /**
+     * 检查是否正在播放
+     * @returns {boolean} 正在播放返回true
+     */
+    isPlaying() {
+        return this._isPlaying;
+    },
+
+    /**
+     * 检查是否处于暂停状态
+     * @returns {boolean} 暂停状态返回true
+     */
+    isPaused() {
+        return this._isPaused;
+    },
+
+    /**
+     * 获取当前播放状态
+     * @returns {string} 'playing'-播放中 | 'paused'-已暂停 | 'stopped'-已停止
+     */
+    getState() {
+        if (this._isPaused) return 'paused';
+        if (this._isPlaying) return 'playing';
+        return 'stopped';
+    },
+
+    /**
+     * 设置语音参数（适用于下次播放）
+     * @param {object} options - 语音参数
+     * @param {number} [options.rate] - 语速
+     * @param {number} [options.pitch] - 音高
+     * @param {number} [options.volume] - 音量
+     */
+    setOptions(options) {
+        if (this._utterance) {
+            if (options.rate !== undefined) this._utterance.rate = options.rate;
+            if (options.pitch !== undefined) this._utterance.pitch = options.pitch;
+            if (options.volume !== undefined) this._utterance.volume = options.volume;
+        }
     }
-}
-
-function speak() {
-    // 使用示例
-    speechUtils
-        .speak("你好，这是一个增强版语音示例",{
-            lang: "zh-CN"
-        })
-        .then(() => console.log("播放完成"))
-        .catch((err) => console.error("播放失败:", err))
-}
-
-// 获取语音列表
-// speechUtils.getVoices().then((voicesList) => {
-//     const list = voicesList.filter((item) => item.lang === "zh-CN")
-//     console.log("可用语音:", list)
-// })
+};

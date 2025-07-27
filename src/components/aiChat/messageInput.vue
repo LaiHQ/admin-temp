@@ -3,7 +3,9 @@
         <!-- menu -->
         <div class="menu">
             <div class="menu-item" @click="startRecording">
-                <AudioOutlined />
+                <a-tooltip title="录音">
+                    <AudioOutlined />
+                </a-tooltip>
             </div>
             <div class="menu-item">
                 <a-dropdown arrow placement="top" :trigger="['hover']">
@@ -22,7 +24,9 @@
                 <VideoCameraOutlined />
             </div>
             <div class="menu-item">
-                <UploadOutlined />
+                <a-tooltip title="上传文档">
+                    <UploadOutlined />
+                </a-tooltip>
             </div>
             <!-- <AudioMutedOutlined /> -->
         </div>
@@ -39,18 +43,22 @@
                 </a-space>
             </div>
             <div class="handle">
-                <a-button v-if="!loading && isEmpty && !disconnect" type="primary" shape="circle" :disabled="isEmpty" @click="handlePressEnter">
-                    <ArrowUpOutlined />
-                </a-button>
+                <a-tooltip title="请输入你的问题">
+                    <a-button v-if="!loading && isEmpty && !disconnect" type="primary" shape="circle" :disabled="isEmpty" @click="handlePressEnter">
+                        <ArrowUpOutlined />
+                    </a-button>
+                </a-tooltip>
                 <a-button v-if="!loading && !isEmpty" type="primary" shape="circle" :disabled="isEmpty" @click="handlePressEnter">
                     <ArrowUpOutlined />
                 </a-button>
                 <a-button type="primary" ghost v-if="loading && isEmpty && !disconnect" shape="circle" @click="disconnect">
                     <LoadingOutlined />
                 </a-button>
-                <a-button type="primary" ghost v-if="loading && disconnect" shape="circle" @click="disconnect">
-                    <div style="width: 14px; height: 14px; background-color: #d9d9d9; margin: 0 auto"></div>
-                </a-button>
+                <a-tooltip title="停止生成" v-if="loading && disconnect">
+                    <a-button type="primary" ghost v-if="loading && disconnect" shape="circle" @click="disconnect">
+                        <div style="width: 14px; height: 14px; background-color: #d9d9d9; margin: 0 auto"></div>
+                    </a-button>
+                </a-tooltip>
             </div>
         </div>
         <!--  -->
@@ -72,6 +80,7 @@ import { ArrowUpOutlined, LoadingOutlined, PauseCircleOutlined, AudioOutlined, A
 import { screenshot } from "@/components/aiChat/utils"
 
 import RecordRTC from "recordrtc"
+// https://www.webrtc-experiment.com/RecordRTC/simple-demos/
 
 const props = defineProps({
     modelValue: {
@@ -126,6 +135,8 @@ function stopRecording() {
         const blob = recorder.getBlob()
         const url = URL.createObjectURL(blob)
         // 使用或下载录音
+
+        console.log(url)
     })
 }
 
@@ -154,9 +165,10 @@ onMounted(() => {
     // padding-inline: 10px;
     // padding-top: 10px;
     position: relative;
-    background-color: rgb(248, 249, 250);
+    background-color: var(--bg-color, rgb(248, 249, 250)); ;
     .textarea {
         padding: 5px 16px;
+        color: var(--text-color, #333);
     }
 
     .menu {

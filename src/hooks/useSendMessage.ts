@@ -93,7 +93,7 @@ export const useSelectDerivedMessages = () => {
         ])
     }
 
-    const addNewestAnswer = (answer: string, inThink = false, think = "", thinkDuration = 0) => {
+    const addNewestAnswer = (answer: string, inThink = false, think = "", thinkDuration = 0,done = false) => {
         setDerivedMessages([
             ...(derivedMessages.value?.slice(0, -1) ?? []),
             {
@@ -103,7 +103,8 @@ export const useSelectDerivedMessages = () => {
                 inThink,
                 thinkDuration,
                 timestamp: new Date().getTime(),
-                id: uuid()
+                id: uuid(),
+                done
             }
         ])
     }
@@ -125,7 +126,7 @@ export const useSelectDerivedMessages = () => {
 // 回话页面相关 hook
 export const useSendMessage = (conversationId: string) => {
     const value = ref("")
-    const { loading, send, answer, disconnect } = useSendMessageWithSse("http://localhost:3000/ai/stream")
+    const { loading, send, answer, disconnect } = useSendMessageWithSse("https://localhost:3000/ai/stream")
     const { derivedMessages, addNewestQuestion, addNewestAnswer, refDom, setDerivedMessages } = useSelectDerivedMessages()
 
     const toBottom = (behavior: "auto" | "instant" | "smooth" = "instant") => {
@@ -140,27 +141,29 @@ export const useSendMessage = (conversationId: string) => {
         const nextValue = val.replaceAll("\\n", "\n").replaceAll("\\t", "\t")
         value.value = nextValue
     }
-    const handlePressEnter = () => {
-        if (trim(value.value) === "") return
+    const handlePressEnter = (e: any) => { 
+        let msg = ''
+        // 回车
+        if(e.type === "keydown" || e.type === "click"){
+           msg = value.value
+        }else{
+            msg = e
+        }
+        if (trim(msg) === "") return
         if (loading.value) return
         // 1.发送消息
-        beforeSendMessage(value.value)
+        beforeSendMessage(msg)
         // 2.添加 新问题组装数据
         addNewestQuestion(
             {
-                content: value.value,
+                content: msg,
                 id: uuid,
                 role: "user",
                 timestamp: new Date().getTime()
-<<<<<<< HEAD
-            },
-            "<span>...</span>"
-=======
             }
->>>>>>> 96872ebad5c3b658810472e8482ffc89297e780d
         )
         // 3.清空输入框
-        value.value = ""
+        if(e.type === "keydown" || e.type === "click") value.value = "";
 
         // 4. 定位到底部
         toBottom()
@@ -191,9 +194,15 @@ export const useSendMessage = (conversationId: string) => {
     let _temp = ""
     let _temp_think = ""
     watch([answer, loading], ([val, isEnd]) => {
-        if (!isEnd) {
+        const done = !isEnd       
+        if (!isEnd) {            
+            addNewestAnswer(_temp, val.inThink, _temp_think, val.thinkDuration,done)
             _temp = ""
             _temp_think = ""
+
+            nextTick(()=>{
+                toBottom()
+            })
         } else {
             // 思考中
             if (val.inThink) {
@@ -203,7 +212,8 @@ export const useSendMessage = (conversationId: string) => {
             }
             if (val.data && !val.inThink) {
                 _temp += val.data
-                _temp_think = _temp_think.trim()
+                _temp_think = _temp_think.trim()               
+
                 addNewestAnswer(_temp, val.inThink, _temp_think, val.thinkDuration)
             }
         }

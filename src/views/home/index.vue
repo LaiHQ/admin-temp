@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <AiChat height="400px" style="border: 1px solid #e5e5e5"></AiChat>
+        <AiChat  :height="`calc(100vh - 420px)`" style="border: 1px solid #e5e5e5;" title="前端小助手"></AiChat>
 
         <!-- <div style="width: 792px; height: 1123px; border: 1px solid #333; position: relative; ">
             <div style="position: absolute; left: 600px; top: 700px; width: 200px; height: 200px; border: 1px solid #333"></div>
@@ -17,8 +17,6 @@
                 style="position: absolute; border: 1px solid #333"
             ></div>
         </div> -->
-
-        <a-button @click="fn">截图</a-button>
     </div>
 </template>
 
@@ -46,6 +44,6 @@ onMounted(() => {})
 
 <style scoped>
 .home {
-    /* height: calc(100vh - 120px); */
+    height: calc(100vh - 120px);
 }
 </style>

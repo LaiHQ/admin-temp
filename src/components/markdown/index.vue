@@ -106,18 +106,13 @@ let outputQueue = ""
 watch(
     () => props.content,
     (text) => {
-        outputQueue += text
-        if (!window._outputPending) {
-            window._outputPending = true
-            requestAnimationFrame(() => {
-                debugger
-                markdownPreviewRef.value.innerHTML = markdown.parse(outputQueue)
-                outputQueue = ""
-                window._outputPending = false
-            })
-        }
+         markdownPreviewRef.value.innerHTML = markdown.parse(text) 
+    },{
+        immediate: false
     }
 )
+
+
 
 defineExpose({ markdownPreviewRef })
 </script>

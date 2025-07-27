@@ -4,22 +4,40 @@
             <section :class="['item-section', itemClass('item-section', item)]">
                 <div class="item-content">
                     <div class="item-avatar">
-                        <a-avatar v-if="isUser(item)" :src="avatar">
+                        <a-avatar v-if="isUser(item)" :src="avatar" class="avatar-img">
                             <template #icon v-if="!avatar">
                                 <UserOutlined />
                             </template>
                         </a-avatar>
 
-                        <img v-else class="avatar-img" src="https://file.1d1j.cn/ai-icon/ai-avatar.png" alt="" />
+                        <a-avatar v-else class="avatar-img" src="https://iconfont.alicdn.com/p/avatar/kPjatG8l6pvn.jpg" alt="" />
                     </div>
 
                     <div class="item-info">
                         <div class="item-handle">
                             <slot name="handle"> </slot>
                         </div>
+                        <!--  --> 
+                                                
+                        <!--  -->
                         <div class="item-text">
                             <template v-if="isUser(item)">
+
                                 {{ item.content }}
+                                
+                                <div class="content-handle content-handle-user"  v-if="isUser(item)">
+                                    <a-tooltip title="复制">
+                                        <div class="content-handle-item" style="color: rgba(0, 0, 0, 0.6);" @click="handleCopyText(item)">
+                                            <CopyOutlined v-if="!item.copy" />
+                                            <CheckOutlined v-if="item.copy" />
+                                        </div>
+                                    </a-tooltip>
+                                    <a-tooltip title="修改">
+                                        <div class="content-handle-item" style="color: rgba(0, 0, 0, 0.6);">
+                                            <EditOutlined />
+                                        </div>
+                                    </a-tooltip>
+                            </div>
                             </template>
                             <template v-else>
                                 <div v-if="item.think">
@@ -34,8 +52,30 @@
                                 </div>
                                 <div class="md-warp" v-if="item.content">
                                     <Markdown :content="item.content" />
+                                    <!--  -->
+                                    <div class="content-handle" v-if="item.done">
+                                        <a-tooltip title="复制">
+                                            <div class="content-handle-item" @click="handleCopyText(item) ">
+                                                <CopyOutlined v-if="!item.copy" />
+                                                <CheckOutlined v-if="item.copy" />
+                                            </div>
+                                        </a-tooltip>
+                                        <a-tooltip :title="item.speechStatus === 'playing' ? '暂停' : '播放' ">
+                                            <div class="content-handle-item" @click="handlePlay(item) ">
+                                                 <PauseCircleOutlined v-if="item.speechStatus === 'playing'" />
+                                                 <PlayCircleOutlined v-else />
+                                            </div>
+                                        </a-tooltip>                                       
+                                        <a-tooltip title="重新生成">
+                                            <div class="content-handle-item" @click="handleRegenerate(item,idx)">
+                                                <SyncOutlined />
+                                            </div>
+                                        </a-tooltip>
+                                    </div>
+                                    <!--  -->
                                 </div>
                                 <!--  -->
+
                                 <template v-else>
                                     <LoadingOutlined v-if="!item.inThink" style="font-size: 16px" />
                                 </template>
@@ -49,9 +89,14 @@
 </template>
 
 <script setup>
-import { computed } from "vue"
+import { computed,nextTick,onMounted,onUnmounted } from "vue"
 import Markdown from "@/components/markdown/index.vue"
-import { LoadingOutlined, DownOutlined } from "@ant-design/icons-vue"
+import { LoadingOutlined, DownOutlined, CopyOutlined } from "@ant-design/icons-vue"
+
+import { copyText ,speech } from "@/components/aiChat/utils"
+
+const emit = defineEmits(['handleRegenerate'])
+
 
 const props = defineProps({
     derivedMessages: {
@@ -71,6 +116,62 @@ const isUser = computed(
         ({ role }) =>
             role === "user"
 )
+
+function handleRegenerate(item,idx){
+    // console.log(props.derivedMessages[idx-1].content)
+    emit('handleRegenerate',props.derivedMessages[idx-1].content)
+}
+
+function handlePlay(item) {
+    if(item.speechStatus === 'playing'){
+        speech.pause()
+        item.speechStatus = 'paused'
+        return
+    }
+    if(item.speechStatus === 'paused'){
+        speech.resume()
+        item.speechStatus = 'playing'
+        return
+    }
+    item.speechStatus = 'playing'
+    speech
+        .play(item.content,{
+            lang: "zh-CN"
+        })
+        .then(() => {            
+            console.log("播放完成")
+            item.speechStatus = 'stopped'
+        })
+        .catch((err) => {
+            console.error("播放失败:", err)
+        }).finally(()=>{
+            item.speechStatus = 'stopped'
+        })
+}
+
+function handleCopyText(item){
+    item.copy = true
+    copyText(item.content)
+    setTimeout(()=>{
+        item.copy = false
+    },800)
+}
+
+onMounted(()=>{
+   nextTick(()=>{
+     speech.stop()
+   })
+
+   // 获取语音列表
+// speech.getVoices().then((voicesList) => {
+//     const list = voicesList.filter((item) => item.lang === "zh-CN")
+//     console.log("可用语音:", list)
+// })
+})
+
+onUnmounted(()=>{
+    speech.stop()
+})
 </script>
 
 <style lang="less" scoped>
@@ -85,8 +186,8 @@ const isUser = computed(
         }
 
         .item-content {
-            display: inline-flex;
-            gap: 16px;
+            display: inline-flex;            
+            gap: 16px;            
         }
 
         .item-avatar {
@@ -106,6 +207,13 @@ const isUser = computed(
             gap: 8px;
             align-items: stretch;
             flex-direction: column;
+            position: relative;
+            .content-handle-user{
+                position: absolute;
+                bottom: -35px;
+                right: 0;
+                display: none;
+            }
 
             .item-handle {
                 column-gap: 8px;
@@ -138,7 +246,7 @@ const isUser = computed(
 
     .item-section-right {
         width: 90%;
-        overflow: hidden;
+        // overflow: hidden;
 
         .item-content {
             flex-direction: row-reverse;
@@ -161,6 +269,13 @@ const isUser = computed(
                 border: 7px solid transparent;
                 border-left-color: rgb(7, 192, 95);
             }
+
+            &:hover{
+                .content-handle-user{
+                    display: flex;
+                    transition: all 0.2s;
+                }
+            }
         }
     }
 
@@ -181,6 +296,20 @@ const isUser = computed(
                 z-index: 95;
                 border-right-color: rgb(239, 245, 254);
             }
+        }
+    }
+}
+
+.content-handle {
+    display: flex;
+    justify-content: end;
+    .content-handle-item {
+        padding: 6px;
+        cursor: pointer;
+        margin-left: 4px;
+        &:hover {
+            background-color: rgba(48, 50, 54, 0.05);
+            border-radius: 4px;
         }
     }
 }
