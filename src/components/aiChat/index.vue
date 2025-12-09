@@ -16,7 +16,7 @@
             </slot>
         </div>
         <!--  -->
-        <div class="message-listwarp" :style="{ height: height }" @scroll="handleScroll">                
+        <div class="message-listwarp" :style="{ height: height }" @scroll="handleScroll">
             <template v-if="derivedMessages.length">
                 <MessageItem :derivedMessages="derivedMessages" :avatar="userInfo.avatar" :nickname="userInfo.nickname" @handleRegenerate="handlePressEnter">
                     <!-- <templdate #item="{item}"></templdate> -->
@@ -37,7 +37,7 @@
             </template>
             <div ref="refDom" />
         </div>
-        <MessageInput v-model="value" :handleToBottom="handleToBottom" :handleInputChange="handleInputChange" :autoScrollEnabled="autoScrollEnabled" :loading="loading" :disconnect="disconnect" :handlePressEnter="handlePressEnter"> </MessageInput>
+        <MessageInput :tags="tags" v-model="value" :handleToBottom="handleToBottom" :handleInputChange="handleInputChange" :autoScrollEnabled="autoScrollEnabled" :loading="loading" :disconnect="disconnect" :handlePressEnter="handlePressEnter"> </MessageInput>
     </div>
 </template>
 
@@ -47,7 +47,7 @@ import { useSendMessage } from "@/hooks/useSendMessage"
 import MessageItem from "@/components/aiChat/messageItem.vue"
 import MessageInput from "@/components/aiChat/messageInput.vue"
 import { EllipsisOutlined, SyncOutlined } from "@ant-design/icons-vue"
-import http from "@/utils/http"
+
 
 function timeFix() {
     const time = new Date()
@@ -63,6 +63,10 @@ const props = defineProps({
     title: {
         type: String,
         default: ""
+    },
+    tags: {
+        type: Array,
+        default: () => []
     }
 })
 const userInfo = computed(() => {
@@ -88,8 +92,8 @@ const welcomeList = [
         desc: "讲一个笑话"
     },
     {
-        title: "使用冒泡排序写一个算法",
-        desc: "使用冒泡排序写一个排序算法"
+        title: "使用js 写一个冒泡排序排序算法",
+        desc: "使用js 写一个冒泡排序排序算法"
     }
 ]
 
@@ -97,11 +101,6 @@ function sendTipContent(item) {
     handlePressEnter(item.title)
 }
 
-onMounted(() => {
-    // http.get("http://localhost:11434/api/tags",{}).then(res=>{
-    //     console.log(res)
-    // })
-})
 </script>
 
 <style lang="less" scoped>

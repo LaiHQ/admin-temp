@@ -79,6 +79,7 @@ export const useSelectDerivedMessages = () => {
     const refDom = useScrollToBottom(derivedMessages)
 
     const addNewestQuestion = (message = {}, answer?: string) => {
+        
         setDerivedMessages([
             ...derivedMessages.value,
             {
@@ -87,7 +88,7 @@ export const useSelectDerivedMessages = () => {
             },
             {
                 role: "assistant",
-                content: answer,
+                content: answer ?? "",
                 id: uuid()
             }
         ])
@@ -98,7 +99,7 @@ export const useSelectDerivedMessages = () => {
             ...(derivedMessages.value?.slice(0, -1) ?? []),
             {
                 role: "assistant",
-                content: inThink ? "" : answer,
+                content: inThink ? "" : (answer ?? '') ,
                 think: inThink ? answer : think,
                 inThink,
                 thinkDuration,
@@ -126,7 +127,7 @@ export const useSelectDerivedMessages = () => {
 // 回话页面相关 hook
 export const useSendMessage = (conversationId: string) => {
     const value = ref("")
-    const { loading, send, answer, disconnect } = useSendMessageWithSse("https://localhost:3000/ai/stream")
+    const { loading, send, answer, disconnect } = useSendMessageWithSse("https://localhost:3000/api/chat")
     const { derivedMessages, addNewestQuestion, addNewestAnswer, refDom, setDerivedMessages } = useSelectDerivedMessages()
 
     const toBottom = (behavior: "auto" | "instant" | "smooth" = "instant") => {
@@ -193,27 +194,28 @@ export const useSendMessage = (conversationId: string) => {
     }
     let _temp = ""
     let _temp_think = ""
-    watch([answer, loading], ([val, isEnd]) => {
+    watch([answer,loading ], ([val, isEnd]) => {
         const done = !isEnd       
+        
         if (!isEnd) {            
-            addNewestAnswer(_temp, val.inThink, _temp_think, val.thinkDuration,done)
-            _temp = ""
-            _temp_think = ""
+            addNewestAnswer(_temp, val.inThink, _temp_think, val.thinkDuration,done)            
 
             nextTick(()=>{
                 toBottom()
+                _temp = ""
+                _temp_think = ""
             })
-        } else {
+        } else {            
             // 思考中
             if (val.inThink) {
                 _temp_think += val.data.trim()
                 addNewestAnswer(_temp_think, val.inThink)
                 return
             }
+            
             if (val.data && !val.inThink) {
                 _temp += val.data
-                _temp_think = _temp_think.trim()               
-
+                _temp_think = _temp_think.trim()
                 addNewestAnswer(_temp, val.inThink, _temp_think, val.thinkDuration)
             }
         }

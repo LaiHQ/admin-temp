@@ -22,8 +22,7 @@
                         <!--  -->
                         <div class="item-text">
                             <template v-if="isUser(item)">
-
-                                {{ item.content }}
+                               <Markdown :content="item.content" />
                                 
                                 <div class="content-handle content-handle-user"  v-if="isUser(item)">
                                     <a-tooltip title="复制">
@@ -257,7 +256,7 @@ onUnmounted(()=>{
             text-align: justify;
             font-family: PingFangSC, PingFang SC;
             padding: 0 10px;
-            padding-top: 5px;
+            // padding-top: 5px;
             background-color: rgb(7, 192, 95);
             color: #fff;
 

@@ -127,12 +127,12 @@ html {
 }
 
 /* 根据系统偏好自动切换 */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #1b1b1f;
-        --text-color: #dfdfd6;
-    }
-}
+// @media (prefers-color-scheme: dark) {
+//     :root {
+//         --bg-color: #1b1b1f;
+//         --text-color: #dfdfd6;
+//     }
+// }
 
 body {
     background-color: var(--bg-color);

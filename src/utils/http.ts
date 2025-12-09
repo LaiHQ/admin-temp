@@ -133,6 +133,8 @@ http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
                     try {
                         const val = JSON.parse(value?.data || "{}")
                         const d = val?.data
+
+                        
                         if (typeof d !== "boolean" && d !== undefined && d.data !== "") {
                             buffer += d.data
                             if (!inThink) {
@@ -149,13 +151,16 @@ http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
                                     if (thinkDuration > 0) {
                                         obj.thinkDuration = thinkDuration
                                     }
+                                    
                                     onMessage?.(obj)
                                     answer.value = obj
+
+                                    // debugger
                                     // console.log(buffer)
                                 }
                             } else {
                                 const thinkEnd = buffer.indexOf("</think>")
-                                if (thinkEnd !== -1) {
+                                if (thinkEnd !== -1) {                                    
                                     const thinkContent = buffer.substring(0, thinkEnd)
                                     buffer = buffer.slice(thinkEnd + 8).trim()
                                     thinkEndTimestamp = new Date().getTime()
@@ -168,7 +173,7 @@ http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
                                         inThink
                                     }
                                     onMessage?.(obj)
-                                    answer.value = obj
+                                    answer.value = obj                                    
                                     // console.log("【思考中】：", buffer)
                                 }
                             }
@@ -178,10 +183,12 @@ http.sse = async (url, params, { onMessage, onError, signal } = {}) => {
                     } catch (e) {
                         console.warn(e)
                         done.value = true
+                        answer.value.data = ''
                     }
                     if (isDone) {
                         done.value = true
-                        // console.info("done")
+                        answer.value.data = ''
+                        console.info("done")
                         break
                     }
                 }

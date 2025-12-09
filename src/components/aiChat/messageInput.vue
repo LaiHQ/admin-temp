@@ -13,6 +13,7 @@
                     <template #overlay>
                         <a-menu @click="handleItemClick">
                             <a-menu-item key="screenshot">截图</a-menu-item>
+                            <a-menu-item key="screen">分享网页/屏幕/窗口</a-menu-item>
                             <a-menu-item>
                                 <a-upload>上传图片</a-upload>
                             </a-menu-item>
@@ -31,12 +32,12 @@
             <!-- <AudioMutedOutlined /> -->
         </div>
         <!--  -->
-        <a-textarea class="textarea" :bordered="false" :value="modelValue" @change="handleInputChange" @pressEnter="handlePressEnter" placeholder="请输入" :auto-size="{ minRows: 3, maxRows: 10 }" />
+        <a-textarea class="textarea" :bordered="false" :value="modelValue" @change="handleInputChange" @pressEnter="handlePressEnter" placeholder="请输入" :auto-size="{ minRows: 3, maxRows: 5 }" />
         <div class="input-footer">
             <div class="model">
                 <a-space>
-                    <a-select style="width: 120px" v-model:value="state.model">
-                        <a-select-option value="DeepSeek">DeepSeek</a-select-option>
+                    <a-select style="width: 180px" v-model:value="state.model">                       
+                        <a-select-option :value="item.name" v-for="item in tags" :key="item.name">{{item.name}}</a-select-option>
                     </a-select>
                     <a-button :type="state.think ? 'primary' : 'default'" :ghost="state.think" @click="state.think = !state.think">深度思考</a-button>
                     <a-button :type="state.network ? 'primary' : 'default'" :ghost="state.network" @click="state.network = !state.network">联网搜索</a-button>
@@ -106,13 +107,17 @@ const props = defineProps({
     autoScrollEnabled: {
         type: Boolean,
         default: true
+    },
+    tags: {
+        type: Array,
+        default: () => []
     }
 })
 
 const emit = defineEmits(["update:modelValue"])
 
 const state = reactive({
-    model: "deepseek",
+    model: "",
     think: false,
     network: false
 })
@@ -141,7 +146,7 @@ function stopRecording() {
 }
 
 function handleItemClick(e) {
-    if (e.key === "screenshot") {
+    if (e.key === "screen") {
         // console.log("截图")
         screenshot((image) => {
             console.log(image)

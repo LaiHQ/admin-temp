@@ -1,122 +1,121 @@
 <template>
-    <div ref="markdownPreviewRef" class="markdown-content"></div>
+    <VueMarkdown :markdown="content" :remark-plugins="remarkPlugins" :rehype-plugins="rehypePlugins" :customAttrs="customAttrs">
+        <template #ul="{ children, depth, ...props }">
+            <ul :class="['unordered-list', `list-depth-${depth}`]">
+                <Component :is="children" />
+            </ul>
+        </template>
+
+        <template #code="{ children, ...props }">           
+            <div class="code-block" v-if="props.language"> 
+                <div class="code-block-header">
+                    <span class="code-block-header-language">{{ props.language }}</span>
+                    <div class="code-block-header-actions">
+                        <div class="header-actions-item">复制</div>
+                        <div class="header-actions-item">下载</div>
+                    </div>
+                </div>
+                <div class="code-block-content">
+                  <code :lang="props.language">
+                    <component :is="children" />
+                  </code>
+                </div>
+            </div>
+             <code  v-else>
+                    <component :is="children" />
+                  </code>
+        </template>
+    </VueMarkdown>
 </template>
 
-<script setup name="YMarkdownContent">
-import { Marked } from "marked"
-import { markedHighlight } from "marked-highlight"
-import hljs from "highlight.js"
-import "highlight.js/styles/atom-one-dark.css"
-import katex from "katex"
-import "katex/dist/katex.min.css"
-import { watch } from "vue"
+<script setup>
+import { VueMarkdown } from "@crazydos/vue-markdown"
+// https://github.com/shunnNet/vue-markdown/tree/main
+import remarkGfm from "remark-gfm"
+import rehypeRaw from "rehype-raw"
 
-const markdownPreviewRef = ref(null)
+import rehypeHighlight from "rehype-highlight"
+
+import javascript from "highlight.js/lib/languages/javascript"
+import python from "highlight.js/lib/languages/python"
+import java from "highlight.js/lib/languages/java"
+import css from "highlight.js/lib/languages/css"
+import json from "highlight.js/lib/languages/json"
+
+import "highlight.js/styles/github.css" // GitHub风格
+// import 'highlight.js/styles/atom-one-dark.css' // Atom暗色主题
 
 const props = defineProps({
     content: {
         type: String,
         default: ""
-    },
-    showLine: {
-        type: Boolean,
-        default: false
-    },
-    showLoading: {
-        type: Boolean,
-        default: false
     }
 })
 
-const markdown = new Marked(
-    {
-        extensions: [
-            {
-                name: "math",
-                level: "inline",
-                start(src) {
-                    return src.indexOf("$")
-                },
-                tokenizer(src, tokens) {
-                    const match = src.match(/^\$+([^$\n]+?)\$+/)
-                    if (match) {
-                        return {
-                            type: "math",
-                            raw: match[0],
-                            text: match[1].trim()
-                        }
-                    }
-                },
-                renderer(token) {
-                    try {
-                        return katex.renderToString(token.text, {
-                            throwOnError: false,
-                            displayMode: false
-                        })
-                    } catch (error) {
-                        return `<span class="text-red-500">${error.message}</span>`
-                    }
-                }
-            },
-            {
-                name: "mathBlock",
-                level: "block",
-                start(src) {
-                    return src.indexOf("\n$$")
-                },
-                tokenizer(src, tokens) {
-                    const match = src.match(/^\$\$+\n([^$]+?)\n\$\$+\n/)
-                    if (match) {
-                        return {
-                            type: "mathBlock",
-                            raw: match[0],
-                            text: match[1].trim()
-                        }
-                    }
-                },
-                renderer(token) {
-                    try {
-                        return katex.renderToString(token.text, {
-                            throwOnError: false,
-                            displayMode: true
-                        })
-                    } catch (error) {
-                        return `<div class="text-red-500">${error.message}</div>`
-                    }
-                }
-            }
-        ]
-    },
-    markedHighlight({
-        highlight(str, lang) {
-            lang = ["", "mermaid"].includes(lang) ? "markdown" : lang
-            if (lang && hljs.getLanguage(lang)) {
-                try {
-                    return `<div class="markdown-wrap"> <pre class="hljs" style="padding:10px 8px 8px;margin-bottom:5px;overflow: auto;display: block;border-radius: 5px;"><code><ol style="padding: 0px 7px;list-style:none;width: 20vw;">${hljs.highlight(str, { language: lang, ignoreIllegals: true })?.value}</ol></code></pre></div>`
-                } catch (error) {
-                    console.log(error)
-                }
-            }
-            return `<div class="markdown-wrap"> <pre class="hljs" style="padding:10px 8px 8px;margin-bottom:5px;overflow: auto;display: block;border-radius: 5px;"><code><ol style="padding: 0px 7px;list-style:none;width: 20vw;">${markdown?.utils?.escapeHtml(str)}</ol>
-       </code></pre></div>`
-        }
-    })
-)
-let outputQueue = ""
-watch(
-    () => props.content,
-    (text) => {
-         markdownPreviewRef.value.innerHTML = markdown.parse(text) 
-    },{
-        immediate: false
-    }
-)
+const remarkPlugins = [
+    // 其他 remark 插件
+    remarkGfm
+]
 
+const rehypePlugins = [
+    // 其他 rehype 插件
+    rehypeRaw,
+    [rehypeHighlight, { ignoreMissing: true, languages: { javascript, python,java,css,json }, typographer: true, linkify: true, breaks: true, }]
+]
 
-
-defineExpose({ markdownPreviewRef })
+const customAttrs = {
+    // h1: { 'class': ["heading"] },
+    // h2: { 'class': ["heading"] },
+    a: { target: "_blank", rel: "noopener noreferrer" }
+    //or
+    // a: (node, combinedAttrs) => {
+    //   if (
+    //     typeof node.properties.href === 'string' &&
+    //     node.properties.href.startsWith('https://www.google.com')
+    //   ){
+    //     return { target: '_blank', rel: "noopener noreferrer"}
+    //   } else {
+    //     return {}
+    //   }
+    // }
+}
 </script>
 
-<style lang="less">
-@import "./index.less";
+<style lang="less" scoped>
+.code-block {
+    background-color: #fafafa;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    white-space: pre-wrap;
+    word-break: break-all;
+
+    .code-block-header {
+        padding: 6px 14px 6px 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f5f5f5;
+        .code-block-header-language{
+          font-size: 12px;
+          color: rgb(82 82 82);
+        }
+        .code-block-header-actions{
+          display: flex;
+          font-size: 12px;
+          .header-actions-item{
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            &:hover{
+              background-color: #e5e5e5;
+            }
+          }
+        }
+    }
+    .code-block-content{
+      padding: 14px;
+      font-size: 12px;
+    }
+}
 </style>
