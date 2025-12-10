@@ -26,37 +26,19 @@ const handleClick = () => {
 </script>
 
 <style lang="less" scoped>
-.anchor {
-    width: 100%;
-    height: 100%;
-    border: 1px solid  #1890ff;
+.anchor {   
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 1px solid  #1890ff;
     cursor: pointer;
     position: relative;
     box-sizing: border-box;
     transition: all 0.2s;
     background-color: #fff;
+    &:hover{
+        width: 16px !important;
+        height: 16px !important;
+    }
 }
 
-.anchor:hover {
-    border: 1px solid  #1890ff;
-    transform: scale(1.2);
-}
 
-.incomming-anchor {
-    border: 1px solid  #1890ff;
-}
-
-.incomming-anchor:hover {
-    border: 1px solid  #1890ff;
-}
-
-.outgoing-anchor {
-    border: 1px solid  #1890ff;
-}
-
-.outgoing-anchor:hover {
-    border: 1px solid  #1890ff;
-}
 </style>

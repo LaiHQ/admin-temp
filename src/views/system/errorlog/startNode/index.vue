@@ -1,5 +1,5 @@
 <template>
-    <div class="startNode">startNode {{ properties }}</div>
+    <div class="startNode">startNode {{ properties }} {{ isHover }}</div>
 </template>
 
 <script setup>
@@ -13,8 +13,11 @@ const props = defineProps({
     properties:{
         type: Object,
         default: () => ({}),
+    },
+    isHover: {
+        type: Boolean,
+        default: false,
     }
-    
 });
 
 </script>
@@ -25,6 +28,11 @@ const props = defineProps({
     height: 100%;
     background-color: #fff;
     position: relative;
-    border: 1px solid #000;
+    border: 1px solid #e6e8ee;
+    border-radius: 5px;
+    cursor: grab;
+    &:active {
+        cursor: grabbing;
+    }
 }
 </style>

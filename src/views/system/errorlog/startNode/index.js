@@ -19,42 +19,34 @@ class StartNode extends HtmlNode {
             render: () => this.r
         })
     }
+    setHovered(flag = true) {
+        super.setHovered(flag)
+        console.log('setHovered', flag)
+        if (flag) {
+            this.r.component.props.isHover = true
+        } else {
+            this.r.component.props.isHover = false
+        }
+    }
 
     getAnchorShape(anchorData) {
         const { x, y, type, id } = anchorData
-
+        
         // 使用 Vue 的 h 函数创建 Anchor 组件的虚拟节点
         const anchorVNode = vueH(Anchor, {
-            width: 10,
-            height: 10,
-            className: type === "left" ? "incomming-anchor" : "outgoing-anchor"
+            // width: 10,
+            // height: 10,
+            // className: type === "left" ? "incomming-anchor" : "outgoing-anchor"
         })
-
-        // 使用 Vue 的 h 函数创建容器 div 的虚拟节点
-        const containerVNode = vueH(
-            "div",
-            {
-                style: {
-                    width: "20px",
-                    height: "20px",
-                    position: "relative"
-                },
-                "data-anchor-id": id,
-                "data-anchor-type": type
-            },
-            [anchorVNode]
-        )
-
         // 使用 LogicFlow 的 h 函数创建 foreignObject
         // 注意：我们需要在 foreignObject 被渲染到 DOM 后，使用 Vue 的 render 函数将组件渲染到其中
         const foreignObject = h("foreignObject", {
-            x: x - 5,
-            y: y - 5,
-            width: 20,
-            height: 20,
-            className: `lf-basic-shape lf-node-anchor custom-anchor ${type === "left" ? "incomming-anchor" : "outgoing-anchor"}`,
+            x: x - 8,
+            y: y - 8,
+            width:16,
+            height: 16,
             "data-anchor-id": id,
-            "data-anchor-type": type
+            "data-anchor-type": type,
         })
 
         // 当 foreignObject 被渲染到 DOM 后，使用 Vue 的 render 函数将组件渲染到其中
@@ -65,12 +57,11 @@ class StartNode extends HtmlNode {
                 // 检查是否已经渲染过
                 if (!foreignObjectEl.querySelector(`[data-anchor-id="${id}"]`)) {
                     // 创建容器 div
-                    const container = document.createElement("div")
-                    container.style.width = "20px"
-                    container.style.height = "20px"
-                    container.style.position = "relative"
+                    const container = document.createElement("div")                    
                     container.setAttribute("data-anchor-id", id)
                     container.setAttribute("data-anchor-type", type)
+                    container.classList.add("custom-anchor")
+                    container.classList.add(type === "left" ? "incomming-anchor" : "outgoing-anchor")
 
                     // 使用 Vue 的 render 函数将组件渲染到容器中
                     render(anchorVNode, container)

@@ -75,21 +75,15 @@ onUnmounted(() => {
     height: 100vh;
 }
 
-:deep(.custom-anchor-container){
-    border: 1px solid #000;
-}
-
-/* 确保锚点一直显示 */
-:deep(.lf-node-anchor) {
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: block !important;
-}
-
 :deep(.custom-anchor) {
     opacity: 1 !important;
     visibility: visible !important;
-    display: block !important;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 
