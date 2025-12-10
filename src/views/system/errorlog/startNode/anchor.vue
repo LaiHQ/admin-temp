@@ -1,5 +1,9 @@
 <template>
-        <div @click.stop="handleClick" class="anchor" :class="className" :style="{ width: width + 'px', height: height + 'px' }"></div>
+        <div @click.stop="handleClick($event)" class="anchor" :style="{ width: width + 'px', height: height + 'px' }">
+            
+        </div>
+
+       
 </template>
 
 <script setup>
@@ -14,14 +18,21 @@ const props = defineProps({
         type: Number,
         default: 10,
     },
-    className: {
-        type: String,
-        default: '',
+    isHovered: {
+        type: Boolean,
+        default: false,
+    },
+    onBtnClick: {
+        type: Function,
+        default: () => {},
     },
 });
 
-const handleClick = () => {
-    console.log('click');
+const handleClick = (e) => {
+    console.log('click', e);
+    // if (props.onBtnClick) {
+    //     props.onBtnClick(e);
+    // }
 }
 </script>
 
@@ -34,10 +45,14 @@ const handleClick = () => {
     box-sizing: border-box;
     transition: all 0.2s;
     background-color: #fff;
-    &:hover{
-        width: 16px !important;
-        height: 16px !important;
-    }
+    // &:hover{
+    //     width: 16px !important;
+    //     height: 16px !important;
+    // }
+    // &.is-hovered {
+    //     width: 16px !important;
+    //     height: 16px !important;
+    // }
 }
 
 

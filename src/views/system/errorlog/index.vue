@@ -21,9 +21,10 @@ const renderData = {
             type: 'startNode', // 节点类型，可以传入LogicFlow内置的7种节点类型，也可以注册自定义节点后传入自定义类型
             x: 500, // 节点形状中心在x轴位置
             y: 100, // 节点形状中心在y轴的位置
-            text: 'Start',
+            text: 'text1',
             properties: {
-               'a':123
+               'isHovered':false,
+               'isSelected':false,
             }
         },
         {
@@ -58,8 +59,24 @@ onMounted(() => {
         
     })
     
-    
+    lf.on('custom:onBtnClick', ({ data, e }) => {
+        console.log(data)
+        console.log(e)
+    })
     lf.render(renderData);
+    
+    // lf.on('node:mouseenter,node:mouseleave', ({data,e}) => {          
+    //     lf.getNodeModelById(data.id).setProperties({
+    //         isHovered: e.type === 'mouseover',
+    //     })
+    // })
+
+    // lf.on('node:click', ({data,e}) => {
+    //     console.log(data)
+    //     lf.getNodeModelById(data.id).setProperties({
+    //         isSelected: true,
+    //     })
+    // })
     
     
 });
@@ -84,6 +101,7 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     position: relative;
+    
 }
 
 
