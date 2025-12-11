@@ -8,7 +8,10 @@ const isHovered = ref(false)
 class StartNode extends HtmlNode {
     constructor(props) {
         super(props)
-        this.isMounted = false      
+        this.isMounted = false
+        this.preProperties = null
+        this.preIsHovered = null
+        this.preIsSelected = null
         
         this.r = vueH(VueNode, {
             properties: props.model.getProperties(),
@@ -24,7 +27,6 @@ class StartNode extends HtmlNode {
 
     getAnchorShape(anchorData) {
         const { x, y, type, id } = anchorData
-
         isHovered.value = this.props.model.isHovered
         // console.log('getAnchorShape', isHovered.value)
         // 使用 Vue 的 h 函数创建 Anchor 组件的虚拟节点
@@ -44,10 +46,6 @@ class StartNode extends HtmlNode {
             "data-anchor-id": id,
             "data-anchor-type": type,
         })
-
-       
-
-       
 
         // 当 foreignObject 被渲染到 DOM 后，使用 Vue 的 render 函数将组件渲染到其中
         // 使用 requestAnimationFrame 确保 DOM 已经渲染
@@ -77,7 +75,9 @@ class StartNode extends HtmlNode {
     }
 
     setHtml(rootEl) {
-        const { properties } = this.props.model
+        const { properties, isHovered, isSelected } = this.props.model
+        const currentProperties = this.props.model.getProperties()
+        
         if (!this.isMounted) {
             rootEl.innerHTML = ''
             const node = document.createElement("div")
@@ -86,12 +86,24 @@ class StartNode extends HtmlNode {
             rootEl.appendChild(node)
             this.app.mount(node)
             this.isMounted = true
+            // 确保锚点始终显示
+            this.props.model.setAttributes({isShowAnchor: true})
         } else {
             // 更新响应式数据，这会触发 Vue 组件的重新渲染
-            this.r.component.props.properties = this.props.model.getProperties();
+            if (this.r.component && this.r.component.props) {
+                // isHovered 为什么一直是 false？
+                // 通常因为 isHovered 要依赖节点事件正确更新。你需要确保：
+                // 1. 事件监听 node:mouseenter / node:mouseleave 已经正确设置，并能调用 setProperties({ isHovered: true/false })
+                // 2. getProperties 能拿到最新的属性
+                // 3. setHtml 被 LogicFlow 框架正确调用
 
-            this.r.component.props.isHovered = this.props.model.isHovered
-            this.r.component.props.isSelected = this.props.model.isSelected
+                // 推荐调试：在事件监听回调和 setHtml 内分别打印 isHovered，看状态流转是否有问题。
+
+                // 保持更新数据逻辑如下
+                this.r.component.props.properties = currentProperties
+                this.r.component.props.isHovered = isHovered
+                this.r.component.props.isSelected = isSelected
+            }
         }
     }
     getIcon() {
@@ -99,47 +111,82 @@ class StartNode extends HtmlNode {
     }
     getText() {
         return null
-    }
-   
+    }   
 
     shouldUpdate(){
-        return true
+        const currentProperties = this.props.model.getProperties()
+        const currentIsHovered = this.props.model.isHovered
+        const currentIsSelected = this.props.model.isSelected
+        
+        // 比较 properties、isHovered 和 isSelected 是否发生变化
+        const propertiesChanged = this.preProperties !== currentProperties
+        const hoveredChanged = this.preIsHovered !== currentIsHovered
+        const selectedChanged = this.preIsSelected !== currentIsSelected
+        
+        if (propertiesChanged || hoveredChanged || selectedChanged) {
+            this.preProperties = currentProperties
+            this.preIsHovered = currentIsHovered
+            this.preIsSelected = currentIsSelected
+            return true
+        }
+        
+        return false
     }
 }
 
 class StartNodeModel extends HtmlNodeModel {
+    initNodeData(data) {
+        super.initNodeData(data)
+        // 添加防止重复连接的规则
+        this.sourceRules.push({
+            message: '两个节点之间已经存在连接，不能重复连接',
+            validate: (sourceNode, targetNode, sourceAnchor, targetAnchor, edgeId) => {
+                // edgeId 存在时表示是调整边，允许连接
+                if (edgeId) {
+                    return true
+                }
+                // 检查是否已经存在相同的边
+                const edges = this.graphModel.edges
+                const isDuplicate = edges.some(edge => {
+                    // 排除虚拟边和当前正在调整的边
+                    if (edge.virtual) return false
+                    // 检查是否已经存在相同的 sourceNodeId 和 targetNodeId 的边
+                    return edge.sourceNodeId === sourceNode.id && 
+                           edge.targetNodeId === targetNode.id
+                })
+                return !isDuplicate
+            }
+        })
+    }
+    
     setAttributes() {
         this.width = 180
         this.height = 50
         this.text.editable = false 
-        this.isShowAnchor = true // 始终显示锚点
+        // 始终显示锚点
+        this.isShowAnchor = true
     }
-
-    // 重写 setHovered 方法，确保锚点一直显示
-    // setHovered(flag = true) {
-    //     super.setHovered(flag)
-    //     // 无论 hover 状态如何，都保持锚点显示
-    //     this.isShowAnchor = true
-    // }
-    // setSelected(selected) {
-    //     super.setSelected(selected)
-    //     // 不改变锚点显示状态
-    // }
-
     
-
+    // 重写 setHovered 方法，确保锚点一直显示
+    setHovered(flag = true) {
+        super.setHovered(flag)
+        // 无论 hover 状态如何，都保持锚点显示
+        this.isShowAnchor = true
+    }
+    
+    // 重写 setSelected 方法，确保锚点一直显示
+    setSelected(selected) {
+        super.setSelected(selected)
+        // 不改变锚点显示状态，始终保持显示
+        this.isShowAnchor = true
+    }
+    
     // 重写 setIsShowAnchor 方法，强制锚点始终显示
-    // setIsShowAnchor(flag = true) {
-    //     // 始终设置为 true，忽略传入的参数
-    //     this.isShowAnchor = true
-    // }
-
-    // getOutlineStyle() {
-    //     const style = super.getOutlineStyle()
-    //     // style.stroke = "none"
-    //     // style.hover.stroke = "none"
-    //     return style
-    // }
+    setIsShowAnchor(flag = true) {
+        super.setIsShowAnchor(flag)
+        // 始终设置为 true，忽略传入的参数
+        this.isShowAnchor = true
+    }
     getDefaultAnchor() {
         const { x, y, id, width, height } = this
         const anchors = [

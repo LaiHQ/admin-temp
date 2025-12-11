@@ -11,6 +11,7 @@ import "@logicflow/core/lib/style/index.css";
  const TeleportContainer = getTeleport()
  const flowId = ref('')
 import StartNodeModel from './startNode/index.js';
+import CustomEdge from './customEdge/index.js';
 
 let lf = null;
 const renderData = {
@@ -40,7 +41,16 @@ const renderData = {
     ],
     // 边数据
     edges: [
-        
+        // {
+        //     id: 'edge1',
+        //     type: 'customEdge', // 使用自定义边类型
+        //     sourceNodeId: '21',
+        //     targetNodeId: '22',
+        //     text: '自定义边',
+        //     properties: {
+        //         arrowType: 'default', // 可选: 'default', 'empty', 'half'
+        //     }
+        // }
     ],
 }
 
@@ -48,22 +58,168 @@ const renderData = {
 
 
 onMounted(() => {
+    const container = document.querySelector('#container');
+    // 确保容器可以获得焦点
+    // container.setAttribute('tabindex', '-1');
+    // container.style.outline = 'none';
+    
     lf = new LogicFlow({
-        container: document.querySelector('#container'),
-        
+        // 先使用 bezier 作为默认类型（自定义边基于 BezierEdge，注册后再切换）
+        edgeType: 'bezier',
+        container: container,
+        // grid: true,
+        nodeSelectedOutline:false,
+        hoverOutline:false,
+        hideAnchors: false,
+        keyboard: {
+            enabled: true
+        },
+        // 使用 edgeGenerator 确保新创建的边使用自定义边类型
+        edgeGenerator: (sourceNode, targetNode, currentEdge) => {
+            // 始终返回自定义边类型（直接返回字符串类型）
+            console.log('edgeGenerator 被调用', { sourceNode: sourceNode?.type, targetNode: targetNode?.type, currentEdge });
+            return 'customEdge';
+        }
     })
     register(StartNodeModel, lf);
+    // 注册自定义边
+    lf.register(CustomEdge);
+    // 设置自定义边为默认边类型（确保新创建的边使用自定义边）
+    lf.setDefaultEdgeType('customEdge');
+    
+    // 防止重复连接的全局检查
+    // 监听连接不允许事件来提示用户
+    lf.on('connection:not-allowed', ({ data, msg }) => {
+        console.warn('连接不允许:', msg, data)
+        // 可以在这里显示提示信息给用户，比如使用 message 组件
+    })
     
     lf.on('graph:rendered', ({ graphModel }) => {
         flowId.value = graphModel.flowId
         
+        
+    })
+    
+    // 监听锚点拖拽完成事件，确保新创建的边使用自定义边类型
+    lf.on('anchor:drop', ({ edgeModel }) => {
+        console.log('anchor:drop 事件触发', { edgeId: edgeModel?.id, edgeType: edgeModel?.type });
+        if (edgeModel) {
+            if (edgeModel.type !== 'customEdge') {
+                console.log('修改边类型为 customEdge', edgeModel.id);
+                // 使用 changeEdgeType 方法修改边的类型
+                lf.changeEdgeType(edgeModel.id, 'customEdge');
+            }
+            // 如果边没有文本，设置默认文本
+            const edgeData = edgeModel.getData();
+            if (!edgeData.text || (typeof edgeData.text === 'string' && !edgeData.text) || (typeof edgeData.text === 'object' && !edgeData.text.value)) {
+                // 使用 setText 方法设置文本
+                const edgeModelInstance = lf.getEdgeModelById(edgeModel.id);
+                if (edgeModelInstance) {
+                    edgeModelInstance.setText({ value: '新边' });
+                }
+            }
+        }
+    })
+    
+    // 监听边添加事件，确保新创建的边使用自定义边类型（备用方案）
+    lf.on('edge:add', ({ data }) => {
+        console.log('edge:add 事件触发', { edgeId: data.id, edgeType: data.type });
+        // 如果边的类型不是 customEdge，则修改为 customEdge
+        if (data.type && data.type !== 'customEdge') {
+            console.log('在 edge:add 中修改边类型为 customEdge', data.id);
+            // 使用 changeEdgeType 方法修改边的类型
+            setTimeout(() => {
+                lf.changeEdgeType(data.id, 'customEdge');
+            }, 0);
+        }
+        // 如果边没有文本，设置默认文本
+        if (!data.text || (typeof data.text === 'string' && !data.text) || (typeof data.text === 'object' && !data.text.value)) {
+            setTimeout(() => {
+                const edgeModel = lf.getEdgeModelById(data.id);
+                if (edgeModel) {
+                    edgeModel.setText({ value: '新边' });
+                }
+            }, 0);
+        }
     })
     
     lf.on('custom:onBtnClick', ({ data, e }) => {
         console.log(data)
         console.log(e)
     })
+    
+    // 使用全局键盘事件监听作为备选方案
+    const handleKeyDown = (e) => {
+        // 检查是否按下了删除键
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            // 检查焦点是否在输入框等元素上，如果是则不处理
+            const activeElement = document.activeElement;
+            if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable)) {
+                return;
+            }
+            
+            // 阻止默认行为
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // 检查是否在编辑文本，如果是则不删除
+            const graphModel = lf.graphModel;
+            if (graphModel.textEditElement) {
+                return;
+            }
+            
+            // 获取选中的元素并删除（按照 LogicFlow 内置逻辑）
+            const elements = lf.getSelectElements(true);
+            console.log('删除快捷键触发', elements);
+            console.log('nodes:', elements.nodes);
+            console.log('edges:', elements.edges);
+            
+            if (elements && (elements.nodes?.length > 0 || elements.edges?.length > 0)) {
+                // 先清除选中状态
+                lf.clearSelectElements();
+                
+                // 删除边
+                if (elements.edges && elements.edges.length > 0) {
+                    elements.edges.forEach((edge) => {
+                        if (edge && edge.id) {
+                            console.log('删除边:', edge.id);
+                            lf.deleteEdge(edge.id);
+                        }
+                    });
+                }
+                
+                // 删除节点
+                if (elements.nodes && elements.nodes.length > 0) {
+                    elements.nodes.forEach((node) => {
+                        if (node && node.id) {
+                            console.log('删除节点:', node.id);
+                            lf.deleteNode(node.id);
+                        }
+                    });
+                }
+            } else {
+                console.log('没有选中的元素');
+            }
+        }
+    };
+    
+    // 添加全局键盘事件监听
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // 确保容器可以获得焦点，以便接收键盘事件
+    container.addEventListener('click', () => {
+        container.focus();
+    });
+    
     lf.render(renderData);
+    
+    // 在组件卸载时移除事件监听
+    onUnmounted(() => {
+        window.removeEventListener('keydown', handleKeyDown);
+        if (lf) {
+            lf.destroy();
+        }
+    });
     
     // lf.on('node:mouseenter,node:mouseleave', ({data,e}) => {          
     //     lf.getNodeModelById(data.id).setProperties({
@@ -79,10 +235,6 @@ onMounted(() => {
     // })
     
     
-});
-
-onUnmounted(() => {
-    lf.destroy();
 });
 </script>
 

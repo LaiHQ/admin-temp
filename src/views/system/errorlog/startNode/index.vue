@@ -1,8 +1,6 @@
 <template>
     <div class="custom-node" :class="{ 'is-hovered': isHovered, 'is-selected': isSelected }" @click="handleBtnClick(1)">
-        customNode 
-
-        {{ isHovered }} {{ isSelected }}
+                {{ isHovered }} {{ isSelected }}
     </div>
 </template>
 
@@ -56,9 +54,9 @@ const handleBtnClick = (i) => {
         cursor: grabbing;
     }
 
-    &.is-hovered {
-        background-color: #e6f7ff;
-    }
+    // &.is-hovered {
+    //     background-color: #e6f7ff;
+    // }
     &.is-selected {
         border-color: #1890ff;
     }
