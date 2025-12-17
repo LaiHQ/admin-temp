@@ -213,6 +213,9 @@ onMounted(() => {
     lf.zoom(0.5);
 
 
+    
+
+
 
     // 点击节点平滑移动到画布中心
     lf.on('node:click', ({ data }) => {
