@@ -25,20 +25,14 @@ class CustomEdge extends BezierEdge {
         // 文本被编辑的时候，显示编辑框，不显示文本
         if (model.state === ElementState.TEXT_EDIT) return null
 
-        // 即使没有文本，在悬停或选中时也显示标签
-        const hasText = model.text && model.text.value
-        const shouldShow = hasText || model.isHovered || model.isSelected
-        
-        if (shouldShow) {
+        if (model.text && model.text.value) {
             const textPosition = model.getTextPosition()
-            const textValue = hasText ? model.text.value : ''
+            const textValue = model.text.value
             const isHovered = model.isHovered
             const isSelected = model.isSelected
 
             // 估算文本宽度（每个字符约 8px，加上 padding）
-            // 如果没有文本但需要显示，使用默认宽度
-            const textLength = textValue ? textValue.length : 4 // "点击编辑" 的长度
-            const estimatedWidth = Math.max(textLength * 8 + 20, 80)
+            const estimatedWidth = Math.max(textValue.length * 8 + 20, 80)
             const estimatedHeight = 24
 
             // 使用 Vue 的 h 函数创建 CustomEdgeLabel 组件的虚拟节点

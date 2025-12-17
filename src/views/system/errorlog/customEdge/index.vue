@@ -1,6 +1,6 @@
 <template>
-    <div class="custom-edge-label" v-if="text || isHovered || isSelected">
-       {{ isHovered }}
+    <div class="custom-edge-label" v-if="isHovered">
+       {{isHovered}} {{ isSelected }}
     </div>
 </template>
 

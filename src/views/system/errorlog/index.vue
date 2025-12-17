@@ -6,8 +6,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted, reactive } from 'vue';
 import LogicFlow from '@logicflow/core';
+
 import "@logicflow/core/lib/style/index.css";
  import { register, getTeleport } from '@logicflow/vue-node-registry'
+
+
  const TeleportContainer = getTeleport()
  const flowId = ref('')
 import StartNodeModel from './startNode/index.js';
@@ -103,21 +106,10 @@ onMounted(() => {
     // 监听锚点拖拽完成事件，确保新创建的边使用自定义边类型
     lf.on('anchor:drop', ({ edgeModel }) => {
         console.log('anchor:drop 事件触发', { edgeId: edgeModel?.id, edgeType: edgeModel?.type });
-        if (edgeModel) {
-            if (edgeModel.type !== 'customEdge') {
-                console.log('修改边类型为 customEdge', edgeModel.id);
-                // 使用 changeEdgeType 方法修改边的类型
-                lf.changeEdgeType(edgeModel.id, 'customEdge');
-            }
-            // 如果边没有文本，设置默认文本
-            const edgeData = edgeModel.getData();
-            if (!edgeData.text || (typeof edgeData.text === 'string' && !edgeData.text) || (typeof edgeData.text === 'object' && !edgeData.text.value)) {
-                // 使用 setText 方法设置文本
-                const edgeModelInstance = lf.getEdgeModelById(edgeModel.id);
-                if (edgeModelInstance) {
-                    edgeModelInstance.setText({ value: '新边' });
-                }
-            }
+        if (edgeModel && edgeModel.type !== 'customEdge') {
+            console.log('修改边类型为 customEdge', edgeModel.id);
+            // 使用 changeEdgeType 方法修改边的类型
+            lf.changeEdgeType(edgeModel.id, 'customEdge');
         }
     })
     
@@ -130,15 +122,6 @@ onMounted(() => {
             // 使用 changeEdgeType 方法修改边的类型
             setTimeout(() => {
                 lf.changeEdgeType(data.id, 'customEdge');
-            }, 0);
-        }
-        // 如果边没有文本，设置默认文本
-        if (!data.text || (typeof data.text === 'string' && !data.text) || (typeof data.text === 'object' && !data.text.value)) {
-            setTimeout(() => {
-                const edgeModel = lf.getEdgeModelById(data.id);
-                if (edgeModel) {
-                    edgeModel.setText({ value: '新边' });
-                }
             }, 0);
         }
     })
@@ -227,12 +210,77 @@ onMounted(() => {
     //     })
     // })
 
-    // lf.on('node:click', ({data,e}) => {
-    //     console.log(data)
-    //     lf.getNodeModelById(data.id).setProperties({
-    //         isSelected: true,
-    //     })
-    // })
+    lf.zoom(0.5);
+
+
+
+    // 点击节点平滑移动到画布中心
+    lf.on('node:click', ({ data }) => {
+        const nodeModel = lf.getNodeModelById(data.id);
+        if (!nodeModel) return;
+        
+        // 获取画布容器的尺寸
+        const container = lf.container;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        
+        // 获取当前画布的变换信息（缩放和平移）
+        const transformModel = lf.graphModel.transformModel;
+        const currentScale = transformModel.SCALE_X; // 假设 SCALE_X 和 SCALE_Y 相同
+        const currentTranslateX = transformModel.TRANSLATE_X;
+        const currentTranslateY = transformModel.TRANSLATE_Y;
+        
+        // 获取节点在画布坐标系中的位置
+        const nodeX = nodeModel.x;
+        const nodeY = nodeModel.y;
+        
+        // 计算节点当前在屏幕上的位置
+        const nodeScreenX = nodeX * currentScale + currentTranslateX;
+        const nodeScreenY = nodeY * currentScale + currentTranslateY;
+        
+        // 计算画布中心在屏幕上的位置
+        const centerScreenX = (containerWidth-500) / 2;
+        const centerScreenY = containerHeight / 2;
+        
+        // 计算需要平移的总距离（屏幕坐标系）
+        const totalDeltaX = centerScreenX - nodeScreenX;
+        const totalDeltaY = centerScreenY - nodeScreenY;
+        
+        // 动画参数
+        const duration = 500; // 动画时长（毫秒）
+        const startTime = performance.now();
+        let lastProgress = 0;
+        
+        // 动画函数
+        const animate = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);            
+            
+            // 使用缓动函数（ease-in-out）
+            const easeProgress = progress < 0.5
+                ? 2 * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+            
+            // 计算当前帧应该移动的相对距离
+            const deltaProgress = easeProgress - lastProgress;
+            const deltaX = totalDeltaX * deltaProgress;
+            const deltaY = totalDeltaY * deltaProgress;
+            
+            // 更新画布平移（相对移动）
+            lf.translate(deltaX, deltaY);
+            
+            // 更新上一帧的进度
+            lastProgress = easeProgress;
+            
+            // 如果动画未完成，继续下一帧
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+        
+        // 开始动画
+        requestAnimationFrame(animate);
+    });
     
     
 });
