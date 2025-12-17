@@ -213,7 +213,7 @@ onMounted(() => {
     lf.zoom(0.5);
 
 
-    
+
 
 
 
@@ -221,6 +221,7 @@ onMounted(() => {
     lf.on('node:click', ({ data }) => {
         const nodeModel = lf.getNodeModelById(data.id);
         if (!nodeModel) return;
+        lf.zoom(0.85,[nodeModel.x,nodeModel.y]);        
         
         // 获取画布容器的尺寸
         const container = lf.container;
@@ -232,6 +233,8 @@ onMounted(() => {
         const currentScale = transformModel.SCALE_X; // 假设 SCALE_X 和 SCALE_Y 相同
         const currentTranslateX = transformModel.TRANSLATE_X;
         const currentTranslateY = transformModel.TRANSLATE_Y;
+        
+
         
         // 获取节点在画布坐标系中的位置
         const nodeX = nodeModel.x;
