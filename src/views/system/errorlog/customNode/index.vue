@@ -49,15 +49,29 @@
             <!--  -->
             <div class="node-description">{{ properties.description }} </div>
 
-            <div  class="condition-warp" >
-                
-                <div v-for="item in properties.config.condition" style="background-color: #eee;padding: 5px 3px;margin-top: 5px;font-size: 12px;border-radius: 5px;">{{ item.title }}</div>
+            <div  class="condition-warp" >                
+                <div  v-for="item in properties.config.condition" style="background-color: #eee;padding: 5px 3px;margin-top: 5px;font-size: 12px;border-radius: 5px;position: relative;">{{ item.title }}
+                    <div class="node-anchor node-anchor-right" @click.stop :class="{ 'is-open': properties.showNodeMenu }">
+                            <PlusOutlined class="icon" />
+                        </div>
+                </div>
             </div>
             <!-- 锚点这里只是样式，实际的锚点逻辑在model.js中 -->
             <div class="node-anchor node-anchor-top" v-if="properties.anchors.includes('top')">
                 <PlusOutlined class="icon" />
+                <a-popover  placement="right" trigger="click"
+                v-model:open="properties.showNodeMenu" :arrow="false">
+                <template #content>
+                    <div style="width: 200px;">
+                        <!-- <NodeMenu @drag="handleDragNode" @ok="handleOk" /> -->
+                    </div>
+                </template>
+                <div class="node-anchor node-anchor-right" @click.stop :class="{ 'is-open': properties.showNodeMenu }">
+                    <PlusOutlined class="icon" />
+                </div>
+            </a-popover>
             </div>
-            <a-popover v-if="properties.anchors.includes('right')" placement="right" trigger="click"
+            <a-popover v-if="properties.anchors.includes('right') && properties.config.condition.length == 0" placement="right" trigger="click"
                 v-model:open="properties.showNodeMenu" :arrow="false">
                 <template #content>
                     <div style="width: 200px;">
@@ -175,6 +189,8 @@ const handleBtnClick = (type) => {
     box-sizing: border-box;
 }
 
+
+
 .custom-node {
     width: 100%;
     height: 100%;
@@ -214,58 +230,64 @@ const handleBtnClick = (type) => {
 
     }
 
-    // &.is-hovered {
-    //     // background-color: #e6f7ff;
-    //     .node-anchor {
-    //         width: 16px;
-    //         height: 16px;
-    //     }
+    &.is-hovered {
+        // background-color: #e6f7ff;
+        .node-anchor {
+            width: 16px;
+            height: 16px;
+        }
 
-    //     .node-anchor-left {
-    //         left: -9px;
-    //         // background-color: #1677ff;
+        .node-anchor-left {
+            left: -9px;
+            // background-color: #1677ff;
 
-    //         .icon {
-    //             // display: block;
-    //         }
-    //     }
+            .icon {
+                // display: block;
+            }
+        }
 
-    //     .node-anchor-right {
+        .node-anchor-right {
 
-    //         right: -9px;
-    //         background-color: #1677ff;
+            right: -9px;
+            background-color: #1677ff;
 
             
 
-    //         .icon {
-    //             display: block;
-    //         }
-    //     }
+            .icon {
+                display: block;
+            }
+        }
 
-    //     .node-anchor-top {
-    //         top: 0px;
-    //         margin-left: -4px;
-    //         background-color: #1677ff;
+        .condition-warp{
+                .node-anchor-right{
+                    right: -21px;
+                }
+            }
 
-    //         .icon {
-    //             display: block;
-    //         }
-    //     }
+        .node-anchor-top {
+            top: 0px;
+            margin-left: -4px;
+            background-color: #1677ff;
 
-    //     .node-anchor-bottom {
-    //         bottom: -16px;
-    //         margin-left: -4px;
-    //         background-color: #1677ff;
+            .icon {
+                display: block;
+            }
+        }
 
-    //         .icon {
-    //             display: block;
-    //         }
-    //     }
-    // }
+        .node-anchor-bottom {
+            bottom: -16px;
+            margin-left: -4px;
+            background-color: #1677ff;
 
-    // &.is-selected {
-    //     border-color: #1677ff;
-    // }
+            .icon {
+                display: block;
+            }
+        }
+    }
+
+    &.is-selected {
+        border-color: #1677ff;
+    }
 
 
 
@@ -352,5 +374,11 @@ const handleBtnClick = (type) => {
     display: flex;
     flex-flow: column;
     justify-content: center;
+}
+
+.condition-warp{
+    .node-anchor-right{
+        right: -17px;
+    }
 }
 </style>

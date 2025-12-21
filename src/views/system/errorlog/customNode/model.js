@@ -34,9 +34,9 @@ class CustomNode extends HtmlNode {
         })       
         const foreignObject = h("foreignObject", {
             x: type=='right' ?  x - 12 :x+4,
-            y: y - 4,
-            width:8,
-            height: 8,
+            y: y-4,
+            width:10,
+            height: 10,
             "data-anchor-id": id,
             "data-anchor-type": type,
         })
@@ -171,8 +171,8 @@ class CustomNodeModel extends HtmlNodeModel {
                         const anchorY = conditionStartY + condIndex * avgConditionItemHeight + avgConditionItemHeight / 2
                         
                         result.push({
-                            x: x + width / 2,  // 右侧
-                            y: anchorY + 12,
+                            x: (x + width / 2) - 1,  // 右侧
+                            y: anchorY + 11,
                             id: `${position}_${id}_${condIndex}`,  // 唯一标识，包含条件索引
                             type: position,              // 锚点类型
                             index: condIndex,            // 条件索引
