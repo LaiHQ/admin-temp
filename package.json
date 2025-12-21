@@ -29,6 +29,7 @@
     "@crazydos/vue-markdown": "^1.1.4",
     "@logicflow/core": "2.2.0-alpha.0",
     "@logicflow/extension": "2.2.0-alpha.0",
+    "@logicflow/layout": "2.1.0-alpha.3",
     "@logicflow/vue-node-registry": "1.2.0-alpha.0",
     "@shikijs/rehype": "^3.9.1",
     "animate.css": "^4.1.1",
